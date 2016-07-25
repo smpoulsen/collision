@@ -1,0 +1,2 @@
+defmodule Collision do
+end
