@@ -6,6 +6,7 @@ defmodule Collision.Vector do
 
   @spec from_tuple(tuple) :: vector
   def from_tuple({_x, _y} = t), do: Collision.Vector2.from_tuple(t)
+  def from_tuple({_x, _y, _z} = t), do: Collision.Vector3.from_tuple(t)
 end
 
 defprotocol Vector do
