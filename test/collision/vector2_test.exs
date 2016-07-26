@@ -8,7 +8,7 @@ defmodule CollisionVector2Test do
     for_all {x1, y1, x2, y2} in {real, real, real, real} do
       v1 = Vector2.from_tuple({x1, y1})
       v2 = Vector2.from_tuple({x2, y2})
-      Vector2.add(v1, v2) == Vector2.from_tuple({x1+x2, y1+y2})
+      Vector.add(v1, v2) == Vector2.from_tuple({x1+x2, y1+y2})
     end
   end
 
@@ -16,7 +16,7 @@ defmodule CollisionVector2Test do
     for_all {x1, y1, x2, y2} in {real, real, real, real} do
       v1 = Vector2.from_tuple({x1, y1})
       v2 = Vector2.from_tuple({x2, y2})
-      Vector2.subtract(v1, v2) == Vector2.from_tuple({x1-x2, y1-y2})
+      Vector.subtract(v1, v2) == Vector2.from_tuple({x1-x2, y1-y2})
     end
   end
 
@@ -24,15 +24,15 @@ defmodule CollisionVector2Test do
     for_all {x1, y1} in {real, real} do
       v1 = Vector2.from_tuple({x1, y1})
       sum_of_squares = :math.pow(x1, 2) + :math.pow(y1, 2)
-      Vector2.magnitude(v1) == :math.sqrt(sum_of_squares)
+      Vector.magnitude(v1) == :math.sqrt(sum_of_squares)
     end
   end
 
   property :normalize_a_vector do
     for_all {x1, y1} in {real, real} do
       v1 = Vector2.from_tuple({x1, y1})
-      v1_magnitude = Vector2.magnitude(v1)
-      Vector2.normalize(v1) == %Vector2{x: x1/v1_magnitude, y: y1/v1_magnitude}
+      v1_magnitude = Vector.magnitude(v1)
+      Vector.normalize(v1) == %Vector2{x: x1/v1_magnitude, y: y1/v1_magnitude}
     end
   end
 
@@ -40,7 +40,7 @@ defmodule CollisionVector2Test do
     for_all {x1, x2, y1, y2} in {real, real, real, real} do
       v1 = Vector2.from_tuple({x1, y1})
       v2 = Vector2.from_tuple({x2, y2})
-      Vector2.dot_product(v1, v2) == (x1 * x2) + (y1 * y2)
+      Vector.dot_product(v1, v2) == (x1 * x2) + (y1 * y2)
     end
   end
 
@@ -48,24 +48,24 @@ defmodule CollisionVector2Test do
     for_all {x1, x2, y1, y2} in {real, real, real, real} do
       v1 = Vector2.from_tuple({x1, y1})
       v2 = Vector2.from_tuple({x2, y2})
-      dot_product = Vector2.dot_product(v1, v2)
-      x = (dot_product / Vector2.magnitude(v2)) * x2
-      y = (dot_product / Vector2.magnitude(v2)) * y2
-      Vector2.projection(v1, v2) == %Vector2{x: x, y: y}
+      dot_product = Vector.dot_product(v1, v2)
+      x = (dot_product / Vector.magnitude(v2)) * x2
+      y = (dot_product / Vector.magnitude(v2)) * y2
+      Vector.projection(v1, v2) == %Vector2{x: x, y: y}
     end
   end
 
   property :vector_right_normal do
     for_all {x1, y1} in {real, real} do
       v1 = Vector2.from_tuple({x1, y1})
-      Vector2.right_normal(v1) == %Vector2{x: -y1, y: x1}
+      Vector.right_normal(v1) == %Vector2{x: -y1, y: x1}
     end
   end
 
   property :vector_left_normal do
     for_all {x1, y1} in {real, real} do
       v1 = Vector2.from_tuple({x1, y1})
-      Vector2.left_normal(v1) == %Vector2{x: y1, y: -x1}
+      Vector.left_normal(v1) == %Vector2{x: y1, y: -x1}
     end
   end
 
@@ -73,8 +73,8 @@ defmodule CollisionVector2Test do
     for_all {x1, x2, y1, y2} in {real, real, real, real} do
       v1 = Vector2.from_tuple({x1, y1})
       v2 = Vector2.from_tuple({x2, y2})
-      Vector2.per_product(v1, v2) ==
-        Vector2.dot_product(v1, Vector2.right_normal(v2))
+      Vector.per_product(v1, v2) ==
+        Vector.dot_product(v1, Vector.right_normal(v2))
     end
   end
 end
