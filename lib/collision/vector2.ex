@@ -5,7 +5,7 @@ defmodule Collision.Vector2 do
   """
   defstruct x: 0.0, y: 0.0
   alias Collision.Vector2
-  @type t :: %{x: float, y: float}
+  @type t :: Vector2.t
 
   @doc """
   Convert a tuple to a vector.
