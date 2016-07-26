@@ -5,6 +5,8 @@ defmodule Collision.Mixfile do
     [app: :collision,
      version: "0.1.0",
      elixir: "~> 1.3",
+     description: description(),
+     package: package(),
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps()]
@@ -32,6 +34,20 @@ defmodule Collision.Mixfile do
       {:dialyxir, "~> 0.3.3", only: [:dev, :test]},
       {:excheck, "~> 0.4.1", only: :test},
       {:triq, github: "krestenkrab/triq", only: :test},
+    ]
+  end
+
+  defp description do
+    """
+    Vector operations and collision detection.
+    """
+  end
+
+  defp package do
+    [
+      licenses: ["BSD2"],
+      maintainers: ["Travis Poulsen"],
+      links: %{"Github" => "https://github.com/tpoulsen/collision"}
     ]
   end
 end
