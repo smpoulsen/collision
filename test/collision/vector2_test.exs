@@ -115,20 +115,20 @@ defmodule Collision.Vector2Test do
 
   property :vector_right_normal do
     for_all {v1} in {vector2} do
-      Vector.right_normal(v1) == %Vector2{x: -v1.y, y: v1.x}
+      Vector2.right_normal(v1) == %Vector2{x: -v1.y, y: v1.x}
     end
   end
 
   property :vector_left_normal do
     for_all {v1} in {vector2} do
-      Vector.left_normal(v1) == %Vector2{x: v1.y, y: -v1.x}
+      Vector2.left_normal(v1) == %Vector2{x: v1.y, y: -v1.x}
     end
   end
 
   property :per_product do
     for_all {v1, v2} in {vector2, vector2} do
-      Vector.per_product(v1, v2) ==
-        Vector.dot_product(v1, Vector.right_normal(v2))
+      Vector2.per_product(v1, v2) ==
+        Vector.dot_product(v1, Vector2.right_normal(v2))
     end
   end
 end

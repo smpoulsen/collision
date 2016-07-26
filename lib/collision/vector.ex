@@ -85,32 +85,13 @@ defprotocol Vector do
   def projection(vector, vector)
 
   @doc """
-  Right normal of a vector.
+  Cross product of two vectors
 
   ## Examples
 
-  iex> Vector.right_normal(%Collision.Vector2{x: 3.0, y: 4.0})
-  %Collision.Vector2{x: -4.0, y: 3.0}
+  iex> Vector.cross_product(%Collision.Vector3{x: 3.0, y: 4.0, z: 5.0}, %Collision.Vector3{x: -1.0, y: 2.0, z: 4})
+  %Collision.Vector3{x: -2.23606797749979, y: 4.47213595499958, z: 654}
   """
-  def right_normal(vector)
-
-  @doc """
-  Left normal of a vector.
-
-  ## Examples
-
-  iex> Vector.left_normal(%Collision.Vector2{x: 3.0, y: 4.0})
-  %Collision.Vector2{x: 4.0, y: -3.0}
-  """
-  def left_normal(vector)
-
-  @doc """
-  Per product of a pair of vectors.
-
-  ## Examples
-
-  iex> Vector.per_product(%Collision.Vector2{x: 3.0, y: 4.0}, %Collision.Vector2{x: -1.0, y: 2.0})
-  -10.0
-  """
-  def per_product(vector, vector)
+  def cross_product(vector, vector)
 end
+

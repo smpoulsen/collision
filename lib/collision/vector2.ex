@@ -18,6 +18,46 @@ defmodule Collision.Vector2 do
   @spec from_tuple({float, float}) :: t
   def from_tuple({x, y}), do: %Vector2{x: x, y: y}
 
+  @doc """
+  Right normal of a vector.
+
+  ## Examples
+
+  iex> Collision.Vector2.right_normal(%Collision.Vector2{x: 3.0, y: 4.0})
+  %Collision.Vector2{x: -4.0, y: 3.0}
+  """
+  @spec right_normal(t) :: t
+  def right_normal(%Vector2{x: x1, y: y1}) do
+    %Vector2{x: -y1, y: x1}
+  end
+
+  @doc """
+  Left normal of a vector.
+  This is the equivalent of a cross product of a single 2D vector.
+
+  ## Examples
+
+  iex> Collision.Vector2.left_normal(%Collision.Vector2{x: 3.0, y: 4.0})
+  %Collision.Vector2{x: 4.0, y: -3.0}
+  """
+  @spec left_normal(t) :: t
+  def left_normal(%Vector2{x: x1, y: y1}) do
+    %Vector2{x: y1, y: -x1}
+  end
+
+  @doc """
+  Per product of a pair of 2D vectors.
+
+  ## Examples
+
+  iex> Collision.Vector2.per_product(%Collision.Vector2{x: 3.0, y: 4.0}, %Collision.Vector2{x: -1.0, y: 2.0})
+  -10.0
+  """
+  @spec per_product(t, t) :: float
+  def per_product(%Vector2{} = v1, %Vector2{} = v2) do
+    Vector.dot_product(v1, right_normal(v2))
+  end
+
   defimpl Vector, for: Vector2 do
     @type t :: %{x: float, y: float}
 
@@ -58,19 +98,9 @@ defmodule Collision.Vector2 do
       %Vector2{x: x, y: y}
     end
 
-    @spec right_normal(t) :: t
-    def right_normal(%Vector2{x: x1, y: y1}) do
-      %Vector2{x: -y1, y: x1}
-    end
-
-    @spec left_normal(t) :: t
-    def left_normal(%Vector2{x: x1, y: y1}) do
-      %Vector2{x: y1, y: -x1}
-    end
-
-    @spec per_product(t, t) :: float
-    def per_product(%Vector2{} = v1, %Vector2{} = v2) do
-      dot_product(v1, right_normal(v2))
+    @spec cross_product(t, t) :: t
+    def cross_product(%Vector2{} = v1, _v2) do
+      Vector2.right_normal(v1)
     end
   end
 end
