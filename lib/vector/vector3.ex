@@ -1,10 +1,10 @@
-defmodule Collision.Vector.Vector3 do
+defmodule Vector.Vector3 do
   @moduledoc """
   Three dimensional vectors.
 
   """
   defstruct x: 0.0, y: 0.0, z: 0.0
-  alias Collision.Vector.Vector3
+  alias Vector.Vector3
   @type t :: Vector3.t
 
   @doc """
@@ -12,8 +12,8 @@ defmodule Collision.Vector.Vector3 do
 
   ## Examples
 
-  iex> Collision.Vector.Vector3.from_tuple({1.0, 1.5, 2.0})
-  %Collision.Vector.Vector3{x: 1.0, y: 1.5, z: 2.0}
+  iex> Vector.Vector3.from_tuple({1.0, 1.5, 2.0})
+  %Vector.Vector3{x: 1.0, y: 1.5, z: 2.0}
   """
   @spec from_tuple({float, float, float}) :: t
   def from_tuple({x, y, z}), do: %Vector3{x: x, y: y, z: z}
@@ -23,8 +23,8 @@ defmodule Collision.Vector.Vector3 do
 
   ## Examples
 
-  iex> Collision.Vector.Vector3.cross_product(%Collision.Vector.Vector3{x: 2.0, y: 1.0, z: -1.0}, %Collision.Vector.Vector3{x: -3.0, y: 4.0, z: 1})
-  %Collision.Vector.Vector3{x: 5.0, y: 1.0, z: 11.0}
+  iex> Vector.Vector3.cross_product(%Vector.Vector3{x: 2.0, y: 1.0, z: -1.0}, %Vector.Vector3{x: -3.0, y: 4.0, z: 1})
+  %Vector.Vector3{x: 5.0, y: 1.0, z: 11.0}
   """
   @spec cross_product(t, t) :: t
   def cross_product(%Vector3{x: x1, y: y1, z: z1}, %Vector3{x: x2, y: y2, z: z2}) do
