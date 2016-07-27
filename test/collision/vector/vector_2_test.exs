@@ -92,7 +92,7 @@ defmodule Collision.Vector.Vector2Test do
   property :magnitude_of_a_vector do
     for_all {v1} in {vector2} do
       sum_of_squares = :math.pow(v1.x, 2) + :math.pow(v1.y, 2)
-      Vector.magnitude(v1) == :math.sqrt(sum_of_squares)
+      Float.round(Vector.magnitude(v1), 5) == Float.round(:math.sqrt(sum_of_squares), 5)
     end
   end
 

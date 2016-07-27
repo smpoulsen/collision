@@ -99,7 +99,7 @@ defmodule Collision.Vector.Vector3Test do
   property :magnitude_of_a_vector do
     for_all {v1} in {vector3} do
       sum_squares = :math.pow(v1.x, 2) + :math.pow(v1.y, 2) + :math.pow(v1.z, 2)
-      Vector.magnitude(v1) == :math.sqrt(sum_squares)
+      Float.round(Vector.magnitude(v1), 5) == Float.round(:math.sqrt(sum_squares), 5)
     end
   end
 
@@ -145,7 +145,6 @@ defmodule Collision.Vector.Vector3Test do
 
   property :vector_cross_product do
     for_all {v1, v2} in {vector3, vector3} do
-      dot_product = Vector.dot_product(v1, v2)
       x = -v1.z * v2.y + v1.y * v2.z
       y = v1.z * v2.x - v1.x * v2.z
       z = -v1.y * v2.x + v1.x * v2.y
