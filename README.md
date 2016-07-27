@@ -1,6 +1,14 @@
 # Collision
 
-**TODO: Add description**
+Vector operations and collision detection.
+
+## Not ready for use
+**TODO:**
+
++ Add 3d vectors
++ Collision detection algorithms
+  + Separating axis
+
 
 ## Installation
 
