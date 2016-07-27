@@ -10,7 +10,8 @@ defmodule Collision.Vector do
 end
 
 defprotocol Vector do
-  @type vector :: Collision.Vector2.t
+  @type vector :: Collision.Vector2.t | Collision.Vector3
+  @type scalar :: float
 
   @doc """
   Convert a vector to a tuple.
@@ -21,6 +22,25 @@ defprotocol Vector do
   {1.0, 1.5}
   """
   def to_tuple(vector)
+
+  @doc """
+  Round all the vector components to n decimal places.
+
+  ## Examples
+
+  iex> Vector.round_components(%Vector2{x: 1.32342, y: 4.23231}, 2)
+  %Vector2{x: 1.32, y: 4.23}
+  """
+  def round_components(vector, integer)
+
+  @doc """
+  Multiple a vector by a scalar value.
+
+  ## Examples
+
+  iex> Vector.scalar_mult(%Collision.Vector2{x: 5.0, y: 2.0}, -1)
+  """
+  def scalar_mult(vector, scalar)
 
   @doc """
   Add two vectors together.
@@ -51,6 +71,16 @@ defprotocol Vector do
   5.0
   """
   def magnitude(vector)
+
+  @doc """
+  Calculate the squared magnitude of a vector.
+
+  ## Examples
+
+  iex> Vector.magnitude(%Collision.Vector2{x: 3.0, y: 4.0})
+  25.0
+  """
+  def magnitude_squared(vector)
 
   @doc """
   Normalize a vector.

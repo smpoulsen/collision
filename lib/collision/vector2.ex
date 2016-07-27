@@ -59,10 +59,21 @@ defmodule Collision.Vector2 do
   end
 
   defimpl Vector, for: Vector2 do
-    @type t :: %{x: float, y: float}
+    @type t :: Vector2.t
+    @type scalar :: float
 
     @spec to_tuple(t) :: {float, float}
     def to_tuple(%Vector2{x: x1, y: y1}), do: {x1, y1}
+
+    @spec round_components(t, integer) :: t
+    def round_components(%Vector2{x: x, y: y}, n) do
+      %Vector2{x: Float.round(x, n), y: Float.round(y, n)}
+    end
+
+    @spec scalar_mult(t, scalar) :: t
+    def scalar_mult(%Vector2{x: x, y: y}, k) do
+      %Vector2{x: x * k, y: y * k}
+    end
 
     @spec add(t, t) :: t
     def add(%Vector2{x: x1, y: y1}, %Vector2{x: x2, y: y2}) do
@@ -75,14 +86,19 @@ defmodule Collision.Vector2 do
     end
 
     @spec magnitude(t) :: float
-    def magnitude(%Vector2{x: x1, y: y1}) do
-      :math.sqrt(:math.pow(x1, 2) + :math.pow(y1, 2))
+    def magnitude(%Vector2{} = v1) do
+      :math.sqrt(magnitude_squared(v1))
+    end
+
+    @spec magnitude_squared(t) :: float
+    def magnitude_squared(%Vector2{} = v1) do
+      dot_product(v1, v1)
     end
 
     @spec normalize(t) :: t
     def normalize(%Vector2{x: x1, y: y1} = v1) do
-      magnitude = magnitude(v1)
-      %Vector2{x: x1/magnitude, y: y1/magnitude}
+      mag = magnitude(v1)
+      %Vector2{x: x1 / mag, y: y1 / mag}
     end
 
     @spec dot_product(t, t) :: float
@@ -91,11 +107,9 @@ defmodule Collision.Vector2 do
     end
 
     @spec projection(t, t) :: t
-    def projection(%Vector2{} = v1, %Vector2{x: x2, y: y2} = v2) do
-      dot_product = dot_product(v1, v2)
-      x = (dot_product / magnitude(v2)) * x2
-      y = (dot_product / magnitude(v2)) * y2
-      %Vector2{x: x, y: y}
+    def projection(%Vector2{} = v1, %Vector2{} = v2) do
+      scaled_dot = dot_product(v1, v2) / magnitude_squared(v2)
+      Vector.scalar_mult(v2, scaled_dot)
     end
 
     @spec cross_product(t, t) :: t

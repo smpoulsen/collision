@@ -21,6 +21,26 @@ defmodule Collision.Vector2Test do
       end)
   end
 
+  property :scalar_multiplication do
+    for_all {v1, k} in {vector2, real} do
+      Vector.scalar_mult(v1, k) ==
+        %Vector2{x: v1.x * k, y: v1.y * k}
+    end
+  end
+
+  property :scalar_multiplication_identity do
+    for_all {v1} in {vector2} do
+      Vector.scalar_mult(v1, 1) == v1
+    end
+  end
+
+  property :scalar_multiplication_commutative do
+    for_all {v1, v2, k} in {vector2, vector2, real} do
+      Vector.round_components(Vector.scalar_mult(Vector.add(v1, v2), k), 5) ==
+        Vector.round_components(Vector.add(Vector.scalar_mult(v1, k), Vector.scalar_mult(v2, k)), 5)
+    end
+  end
+
   # Properties for addition
   property :add_vectors do
     for_all {v1, v2} in {vector2, vector2} do
@@ -107,8 +127,8 @@ defmodule Collision.Vector2Test do
   property :vector_projection do
     for_all {v1, v2} in {vector2, vector2} do
       dot_product = Vector.dot_product(v1, v2)
-      x = (dot_product / Vector.magnitude(v2)) * v2.x
-      y = (dot_product / Vector.magnitude(v2)) * v2.y
+      x = (dot_product / Vector.magnitude_squared(v2)) * v2.x
+      y = (dot_product / Vector.magnitude_squared(v2)) * v2.y
       Vector.projection(v1, v2) == %Vector2{x: x, y: y}
     end
   end

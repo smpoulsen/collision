@@ -23,6 +23,26 @@ defmodule Collision.Vector3Test do
       end)
   end
 
+  property :scalar_multiplication do
+    for_all {v1, k} in {vector3, real} do
+      Vector.scalar_mult(v1, k) ==
+        %Vector3{x: v1.x * k, y: v1.y * k, z: v1.z * k}
+    end
+  end
+
+  property :scalar_multiplication_identity do
+    for_all {v1} in {vector3} do
+      Vector.scalar_mult(v1, 1) == v1
+    end
+  end
+
+  property :scalar_multiplication_commutative do
+    for_all {v1, v2, k} in {vector3, vector3, real} do
+      Vector.round_components(Vector.scalar_mult(Vector.add(v1, v2), k), 5) ==
+        Vector.round_components(Vector.add(Vector.scalar_mult(v1, k), Vector.scalar_mult(v2, k)), 5)
+    end
+  end
+
   # Properties for addition
   property :add_vectors do
     for_all {v1, v2} in {vector3, vector3} do
@@ -116,9 +136,9 @@ defmodule Collision.Vector3Test do
   property :vector_projection do
     for_all {v1, v2} in {vector3, vector3} do
       dot_product = Vector.dot_product(v1, v2)
-      x = (dot_product / Vector.magnitude(v2)) * v2.x
-      y = (dot_product / Vector.magnitude(v2)) * v2.y
-      z = (dot_product / Vector.magnitude(v2)) * v2.z
+      x = (dot_product / Vector.magnitude_squared(v2)) * v2.x
+      y = (dot_product / Vector.magnitude_squared(v2)) * v2.y
+      z = (dot_product / Vector.magnitude_squared(v2)) * v2.z
       Vector.projection(v1, v2) == %Vector3{x: x, y: y, z: z}
     end
   end
@@ -130,6 +150,14 @@ defmodule Collision.Vector3Test do
       y = v1.z * v2.x - v1.x * v2.z
       z = -v1.y * v2.x + v1.x * v2.y
       Vector.cross_product(v1, v2) == %Vector3{x: x, y: y, z: z}
+    end
+  end
+
+  property :cross_product_is_anticommutative do
+    # a × b = -(b × a)
+    for_all {v1, v2} in {vector3, vector3} do
+      Vector.cross_product(v1, v2) ==
+        Vector.scalar_mult(Vector.cross_product(v2, v1), -1)
     end
   end
 end
