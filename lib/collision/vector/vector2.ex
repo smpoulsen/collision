@@ -1,10 +1,10 @@
-defmodule Collision.Vector2 do
+defmodule Collision.Vector.Vector2 do
   @moduledoc """
   Two-dimensional vectors used in detecting collisions.
 
   """
   defstruct x: 0.0, y: 0.0
-  alias Collision.Vector2
+  alias Collision.Vector.Vector2
   @type t :: Vector2.t
 
   @doc """
@@ -12,8 +12,8 @@ defmodule Collision.Vector2 do
 
   ## Examples
 
-  iex> Collision.Vector2.from_tuple({1.0, 1.5})
-  %Collision.Vector2{x: 1.0, y: 1.5}
+  iex> Collision.Vector.Vector2.from_tuple({1.0, 1.5})
+  %Collision.Vector.Vector2{x: 1.0, y: 1.5}
   """
   @spec from_tuple({float, float}) :: t
   def from_tuple({x, y}), do: %Vector2{x: x, y: y}
@@ -23,8 +23,8 @@ defmodule Collision.Vector2 do
 
   ## Examples
 
-  iex> Collision.Vector2.right_normal(%Collision.Vector2{x: 3.0, y: 4.0})
-  %Collision.Vector2{x: -4.0, y: 3.0}
+  iex> Collision.Vector.Vector2.right_normal(%Collision.Vector.Vector2{x: 3.0, y: 4.0})
+  %Collision.Vector.Vector2{x: -4.0, y: 3.0}
   """
   @spec right_normal(t) :: t
   def right_normal(%Vector2{x: x1, y: y1}) do
@@ -37,8 +37,8 @@ defmodule Collision.Vector2 do
 
   ## Examples
 
-  iex> Collision.Vector2.left_normal(%Collision.Vector2{x: 3.0, y: 4.0})
-  %Collision.Vector2{x: 4.0, y: -3.0}
+  iex> Collision.Vector.Vector2.left_normal(%Collision.Vector.Vector2{x: 3.0, y: 4.0})
+  %Collision.Vector.Vector2{x: 4.0, y: -3.0}
   """
   @spec left_normal(t) :: t
   def left_normal(%Vector2{x: x1, y: y1}) do
@@ -50,7 +50,7 @@ defmodule Collision.Vector2 do
 
   ## Examples
 
-  iex> Collision.Vector2.per_product(%Collision.Vector2{x: 3.0, y: 4.0}, %Collision.Vector2{x: -1.0, y: 2.0})
+  iex> Collision.Vector.Vector2.per_product(%Collision.Vector.Vector2{x: 3.0, y: 4.0}, %Collision.Vector.Vector2{x: -1.0, y: 2.0})
   -10.0
   """
   @spec per_product(t, t) :: float

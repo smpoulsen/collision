@@ -1,10 +1,10 @@
-defmodule Collision.Vector3 do
+defmodule Collision.Vector.Vector3 do
   @moduledoc """
-  Two-dimensional vectors used in detecting collisions.
+  Three dimensional vectors.
 
   """
   defstruct x: 0.0, y: 0.0, z: 0.0
-  alias Collision.Vector3
+  alias Collision.Vector.Vector3
   @type t :: Vector3.t
 
   @doc """
@@ -12,35 +12,35 @@ defmodule Collision.Vector3 do
 
   ## Examples
 
-  iex> Collision.Vector3.from_tuple({1.0, 1.5, 2.0})
-  %Collision.Vector3{x: 1.0, y: 1.5, z: 2.0}
+  iex> Collision.Vector.Vector3.from_tuple({1.0, 1.5, 2.0})
+  %Collision.Vector.Vector3{x: 1.0, y: 1.5, z: 2.0}
   """
-  @spec from_tuple({float, float}) :: t
+  @spec from_tuple({float, float, float}) :: t
   def from_tuple({x, y, z}), do: %Vector3{x: x, y: y, z: z}
 
   defimpl Vector, for: Vector3 do
     @type t :: Vector3.t
     @type scalar :: float
 
-    @spec to_tuple(Vector3.t) :: {float, float, float}
+    @spec to_tuple(t) :: {float, float, float}
     def to_tuple(%Vector3{x: x, y: y, z: z}), do: {x, y, z}
 
-    @spec round_components(Vector3.t, integer) :: Vector3.t
+    @spec round_components(t, integer) :: t
     def round_components(%Vector3{x: x, y: y, z: z}, n) do
       %Vector3{x: Float.round(x, n), y: Float.round(y, n), z: Float.round(z, n)}
     end
 
-    @spec scalar_mult(Vector3.t, scalar) :: Vector3.t
+    @spec scalar_mult(t, scalar) :: t
     def scalar_mult(%Vector3{x: x, y: y, z: z}, k) do
       %Vector3{x: x * k, y: y * k, z: z * k}
     end
 
-    @spec add(Vector3.t, Vector3.t) :: Vector3.t
+    @spec add(t, t) :: t
     def add(%Vector3{x: x1, y: y1, z: z1}, %Vector3{x: x2, y: y2, z: z2}) do
       %Vector3{x: x1 + x2, y: y1 + y2, z: z1 + z2}
     end
 
-    @spec subtract(Vector3.t, Vector3.t) :: Vector3.t
+    @spec subtract(t, t) :: t
     def subtract(%Vector3{x: x1, y: y1, z: z1}, %Vector3{x: x2, y: y2, z: z2}) do
       %Vector3{x: x1 - x2, y: y1 - y2, z: z1 - z2}
     end

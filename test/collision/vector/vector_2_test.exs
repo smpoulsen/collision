@@ -1,8 +1,8 @@
-defmodule Collision.Vector2Test do
+defmodule Collision.Vector.Vector2Test do
   use ExUnit.Case
   use ExCheck
-  doctest Collision.Vector2
-  alias Collision.Vector2
+  doctest Collision.Vector.Vector2
+  alias Collision.Vector.Vector2
 
   # Generator for Vector2 values
   def vector2 do
