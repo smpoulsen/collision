@@ -2,15 +2,16 @@ defmodule Collision.Vector do
   @moduledoc """
   Wrapper around vector creation functions.
   """
-  @type vector :: Collision.Vector2.t
+  @type vector_tuple :: {float, float} | {float, float, float}
+  @type vector :: Collision.Vector.Vector2.t | Collision.Vector.Vector3
 
-  @spec from_tuple(tuple) :: vector
-  def from_tuple({_x, _y} = t), do: Collision.Vector2.from_tuple(t)
-  def from_tuple({_x, _y, _z} = t), do: Collision.Vector3.from_tuple(t)
+  @spec from_tuple(vector_tuple) :: vector
+  def from_tuple({_x, _y} = t), do: Collision.Vector.Vector2.from_tuple(t)
+  def from_tuple({_x, _y, _z} = t), do: Collision.Vector.Vector3.from_tuple(t)
 end
 
 defprotocol Vector do
-  @type vector :: Collision.Vector2.t | Collision.Vector3
+  @type vector :: Collision.Vector.Vector2.t | Collision.Vector.Vector3.t
   @type scalar :: float
 
   @doc """
