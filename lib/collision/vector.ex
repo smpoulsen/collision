@@ -115,15 +115,5 @@ defprotocol Vector do
   %Collision.Vector2{x: -2.23606797749979, y: 4.47213595499958}
   """
   def projection(vector, vector)
-
-  @doc """
-  Cross product of two vectors
-
-  ## Examples
-
-  iex> Vector.cross_product(%Collision.Vector3{x: 3.0, y: 4.0, z: 5.0}, %Collision.Vector3{x: -1.0, y: 2.0, z: 4})
-  %Collision.Vector3{x: -2.23606797749979, y: 4.47213595499958, z: 654}
-  """
-  def cross_product(vector, vector)
 end
 

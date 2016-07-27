@@ -149,15 +149,15 @@ defmodule Collision.Vector.Vector3Test do
       x = -v1.z * v2.y + v1.y * v2.z
       y = v1.z * v2.x - v1.x * v2.z
       z = -v1.y * v2.x + v1.x * v2.y
-      Vector.cross_product(v1, v2) == %Vector3{x: x, y: y, z: z}
+      Vector3.cross_product(v1, v2) == %Vector3{x: x, y: y, z: z}
     end
   end
 
   property :cross_product_is_anticommutative do
     # a × b = -(b × a)
     for_all {v1, v2} in {vector3, vector3} do
-      Vector.cross_product(v1, v2) ==
-        Vector.scalar_mult(Vector.cross_product(v2, v1), -1)
+      Vector3.cross_product(v1, v2) ==
+        Vector.scalar_mult(Vector3.cross_product(v2, v1), -1)
     end
   end
 end

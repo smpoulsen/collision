@@ -18,6 +18,22 @@ defmodule Collision.Vector.Vector3 do
   @spec from_tuple({float, float, float}) :: t
   def from_tuple({x, y, z}), do: %Vector3{x: x, y: y, z: z}
 
+  @doc """
+  Cross product of two vectors
+
+  ## Examples
+
+  iex> Collision.Vector.Vector3.cross_product(%Collision.Vector.Vector3{x: 2.0, y: 1.0, z: -1.0}, %Collision.Vector.Vector3{x: -3.0, y: 4.0, z: 1})
+  %Collision.Vector.Vector3{x: 5.0, y: 1.0, z: 11.0}
+  """
+  @spec cross_product(t, t) :: t
+  def cross_product(%Vector3{x: x1, y: y1, z: z1}, %Vector3{x: x2, y: y2, z: z2}) do
+    x_term = -z1 * y2 + y1 * z2
+    y_term = z1 * x2 - x1 * z2
+    z_term = -y1 * x2 + x1 * y2
+    %Vector3{x: x_term, y: y_term, z: z_term}
+  end
+
   defimpl Vector, for: Vector3 do
     @type t :: Vector3.t
     @type scalar :: float
@@ -71,14 +87,6 @@ defmodule Collision.Vector.Vector3 do
       dot = dot_product(v1, v2)
       dot_normalized = dot / magnitude_squared(v2)
       Vector.scalar_mult(v2, dot_normalized)
-    end
-
-    @spec cross_product(t, t) :: t
-    def cross_product(%Vector3{x: x1, y: y1, z: z1}, %Vector3{x: x2, y: y2, z: z2}) do
-      x_term = -z1 * y2 + y1 * z2
-      y_term = z1 * x2 - x1 * z2
-      z_term = -y1 * x2 + x1 * y2
-      %Vector3{x: x_term, y: y_term, z: z_term}
     end
   end
 end
