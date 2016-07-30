@@ -11,9 +11,8 @@ defmodule Collision.Vector.Vector2 do
   Convert a tuple to a vector.
 
   ## Examples
-
-  iex> Collision.Vector.Vector2.from_tuple({1.0, 1.5})
-  %Collision.Vector.Vector2{x: 1.0, y: 1.5}
+    iex> Collision.Vector.Vector2.from_tuple({1.0, 1.5})
+    %Collision.Vector.Vector2{x: 1.0, y: 1.5}
   """
   @spec from_tuple({float, float}) :: t
   def from_tuple({x, y}), do: %Vector2{x: x, y: y}
@@ -22,9 +21,8 @@ defmodule Collision.Vector.Vector2 do
   Get a vector from a set of points.
 
   ## Examples
-
-  iex> Collision.Vector.Vector2.from_points(%{x: 5, y: 3}, %{x: 10, y: 6})
-  %Collision.Vector.Vector2{x: 5, y: 3}
+    iex> Collision.Vector.Vector2.from_points(%{x: 5, y: 3}, %{x: 10, y: 6})
+    %Collision.Vector.Vector2{x: 5, y: 3}
   """
   def from_points(%{x: x1, y: y1}, %{x: x2, y: y2}) do
     %Vector2{x: x2 - x1, y: y2 - y1}
@@ -37,11 +35,10 @@ defmodule Collision.Vector.Vector2 do
   Right normal of a vector.
 
   ## Examples
-
-  iex> Collision.Vector.Vector2.right_normal(
-  ...>   %Collision.Vector.Vector2{x: 3.0, y: 4.0}
-  ...> )
-  %Collision.Vector.Vector2{x: -4.0, y: 3.0}
+    iex> Collision.Vector.Vector2.right_normal(
+    ...>   %Collision.Vector.Vector2{x: 3.0, y: 4.0}
+    ...> )
+    %Collision.Vector.Vector2{x: -4.0, y: 3.0}
   """
   @spec right_normal(t) :: t
   def right_normal(%Vector2{x: x1, y: y1}) do
@@ -53,11 +50,10 @@ defmodule Collision.Vector.Vector2 do
   This is the equivalent of a cross product of a single 2D vector.
 
   ## Examples
-
-  iex> Collision.Vector.Vector2.left_normal(
-  ...>   %Collision.Vector.Vector2{x: 3.0, y: 4.0}
-  ...> )
-  %Collision.Vector.Vector2{x: 4.0, y: -3.0}
+    iex> Collision.Vector.Vector2.left_normal(
+    ...>   %Collision.Vector.Vector2{x: 3.0, y: 4.0}
+    ...> )
+    %Collision.Vector.Vector2{x: 4.0, y: -3.0}
   """
   @spec left_normal(t) :: t
   def left_normal(%Vector2{x: x1, y: y1}) do
@@ -68,12 +64,11 @@ defmodule Collision.Vector.Vector2 do
   Per product of a pair of 2D vectors.
 
   ## Examples
-
-  iex> Collision.Vector.Vector2.per_product(
-  ...>   %Collision.Vector.Vector2{x: 3.0, y: 4.0},
-  ...>   %Collision.Vector.Vector2{x: -1.0, y: 2.0}
-  ...> )
-  -10.0
+    iex> Collision.Vector.Vector2.per_product(
+    ...>   %Collision.Vector.Vector2{x: 3.0, y: 4.0},
+    ...>   %Collision.Vector.Vector2{x: -1.0, y: 2.0}
+    ...> )
+    -10.0
   """
   @spec per_product(t, t) :: float
   def per_product(%Vector2{} = v1, %Vector2{} = v2) do

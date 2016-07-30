@@ -25,6 +25,7 @@ defmodule Collision.Mixfile do
       {:dialyxir, "~> 0.3.3", only: [:dev, :test]},
       {:excheck, "~> 0.4.1", only: :test},
       {:triq, github: "krestenkrab/triq", only: :test},
+      {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end
 
