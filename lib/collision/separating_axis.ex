@@ -24,19 +24,18 @@ defmodule Collision.SeparatingAxis do
   Returns: true | false
 
   ## Examples
+    iex> Collision.SeparatingAxis.collision?(
+    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
+    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2, midpoint: %{x: 4, y: 4}}
+    ...> )
+    false
 
-  iex> Collision.SeparatingAxis.collision?(
-  ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-  ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2, midpoint: %{x: 4, y: 4}}
-  ...> )
-  false
-
-  iex> Collision.SeparatingAxis.collision?(
-  ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-  ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 4,
-  ...>     midpoint: %{x: 4, y: 2}}
-  ...> )
-  true
+    iex> Collision.SeparatingAxis.collision?(
+    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
+    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 4,
+    ...>     midpoint: %{x: 4, y: 2}}
+    ...> )
+    true
   """
   @spec collision?(polygon, polygon) :: boolean
   def collision?(%RegularPolygon{} = p1, %RegularPolygon{} = p2) do
@@ -59,18 +58,18 @@ defmodule Collision.SeparatingAxis do
   Returns: nil | {%Vector2{}, float}
 
   ## Examples
-  iex> Collision.SeparatingAxis.collision_mtv(
-  ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-  ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2, midpoint: %{x: 4, y: 4}}
-  ...> )
-  nil
+    iex> Collision.SeparatingAxis.collision_mtv(
+    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
+    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2, midpoint: %{x: 4, y: 4}}
+    ...> )
+    nil
 
-  iex> Collision.SeparatingAxis.collision_mtv(
-  ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-  ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 4,
-  ...>     midpoint: %{x: 4, y: 1}}
-  ...> )
-  {%Collision.Vector.Vector2{x: 2.0, y: 2.0}, 2.0}
+    iex> Collision.SeparatingAxis.collision_mtv(
+    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
+    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 4,
+    ...>     midpoint: %{x: 4, y: 1}}
+    ...> )
+    {%Collision.Vector.Vector2{x: 2.0, y: 2.0}, 2.0}
   """
   # TODO There is repetition between this and collision?, but it
   # runs faster this way. Refactoring opportunity in the future.
