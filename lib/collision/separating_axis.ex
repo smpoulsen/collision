@@ -40,13 +40,13 @@ defmodule Collision.SeparatingAxis do
   """
   @spec collision?(polygon, polygon) :: boolean
   def collision?(%RegularPolygon{} = p1, %RegularPolygon{} = p2) do
-    p1_vertices = RegularPolygon.vertices(p1)
-    p2_vertices = RegularPolygon.vertices(p2)
+    p1_vertices = RegularPolygon.calculate_vertices(p1)
+    p2_vertices = RegularPolygon.calculate_vertices(p2)
     collision?(p1_vertices, p2_vertices)
   end
   def collision?(p1, p2) do
-    collision_projections(p1, p2)
-    |> Enum.all?(fn zipped_projection ->
+    projections = collision_projections(p1, p2)
+    Enum.all?(projections, fn zipped_projection ->
       overlap(zipped_projection) || containment(zipped_projection)
     end)
   end
@@ -76,8 +76,8 @@ defmodule Collision.SeparatingAxis do
   # runs faster this way. Refactoring opportunity in the future.
   @spec collision_mtv(polygon, polygon) :: {Vector2.t, number}
   def collision_mtv(%RegularPolygon{} = p1, %RegularPolygon{} = p2) do
-    p1_vertices = RegularPolygon.vertices(p1)
-    p2_vertices = RegularPolygon.vertices(p2)
+    p1_vertices = RegularPolygon.calculate_vertices(p1)
+    p2_vertices = RegularPolygon.calculate_vertices(p2)
     collision_mtv(p1_vertices, p2_vertices)
   end
   def collision_mtv(p1, p2) do
@@ -89,7 +89,8 @@ defmodule Collision.SeparatingAxis do
       overlap(zipped_projection) || containment(zipped_projection)
     end)
     if in_collision do
-      Enum.filter(axes_and_projections, fn {_axis, projection} ->
+      axes_and_projections
+      |> Enum.filter(fn {_axis, projection} ->
         overlap(projection) || containment(projection)
       end)
       |> minimum_overlap
