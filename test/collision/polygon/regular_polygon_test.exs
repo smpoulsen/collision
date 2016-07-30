@@ -30,7 +30,7 @@ defmodule Collision.Polygon.RegularPolygonTest do
   property :rotating_polygon_2pi_x_constant_is_no_rotation do
     for_all p in polygon do
       rotations = [-720, -360, 0, 360, 720]
-      vertices = RegularPolygon.vertices(p)
+      vertices = RegularPolygon.calculate_vertices(p)
       Enum.all?(rotations, fn r ->
         RegularPolygon.rotate_polygon_degrees(vertices, r) == vertices
       end)
@@ -39,7 +39,7 @@ defmodule Collision.Polygon.RegularPolygonTest do
 
   property :n_vertices_equals_n_sides do
     for_all p in polygon do
-      vertices = RegularPolygon.vertices(p)
+      vertices = RegularPolygon.calculate_vertices(p)
       length(vertices) == p.n_sides
     end
   end
@@ -48,7 +48,7 @@ defmodule Collision.Polygon.RegularPolygonTest do
   #property :polygon_has_order_n_rotational_symmetry do
   #  for_all p in such_that(p in polygon when p.radius > 0) do
   #    vertices = p
-  #    |> RegularPolygon.vertices
+  #    |> RegularPolygon.calculate_vertices
   #    |> RegularPolygon.round_vertices
   #    |> MapSet.new
   #    radians = 2 * :math.pi / p.n_sides
