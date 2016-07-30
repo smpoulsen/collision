@@ -23,11 +23,15 @@ defmodule Collision.Vector.Vector3 do
 
   ## Examples
 
-  iex> Collision.Vector.Vector3.cross_product(%Collision.Vector.Vector3{x: 2.0, y: 1.0, z: -1.0}, %Collision.Vector.Vector3{x: -3.0, y: 4.0, z: 1})
+  iex> Collision.Vector.Vector3.cross_product(
+  ...>   %Collision.Vector.Vector3{x: 2.0, y: 1.0, z: -1.0},
+  ...>   %Collision.Vector.Vector3{x: -3.0, y: 4.0, z: 1}
+  ...> )
   %Collision.Vector.Vector3{x: 5.0, y: 1.0, z: 11.0}
   """
   @spec cross_product(t, t) :: t
-  def cross_product(%Vector3{x: x1, y: y1, z: z1}, %Vector3{x: x2, y: y2, z: z2}) do
+  def cross_product(%Vector3{x: x1, y: y1, z: z1},
+        %Vector3{x: x2, y: y2, z: z2}) do
     x_term = -z1 * y2 + y1 * z2
     y_term = z1 * x2 - x1 * z2
     z_term = -y1 * x2 + x1 * y2

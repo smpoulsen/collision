@@ -19,11 +19,28 @@ defmodule Collision.Vector.Vector2 do
   def from_tuple({x, y}), do: %Vector2{x: x, y: y}
 
   @doc """
+  Get a vector from a set of points.
+
+  ## Examples
+
+  iex> Collision.Vector.Vector2.from_points(%{x: 5, y: 3}, %{x: 10, y: 6})
+  %Collision.Vector.Vector2{x: 5, y: 3}
+  """
+  def from_points(%{x: x1, y: y1}, %{x: x2, y: y2}) do
+    %Vector2{x: x2 - x1, y: y2 - y1}
+  end
+  def from_points({x1, y1}, {x2, y2}) do
+    %Vector2{x: x2 - x1, y: y2 - y1}
+  end
+
+  @doc """
   Right normal of a vector.
 
   ## Examples
 
-  iex> Collision.Vector.Vector2.right_normal(%Collision.Vector.Vector2{x: 3.0, y: 4.0})
+  iex> Collision.Vector.Vector2.right_normal(
+  ...>   %Collision.Vector.Vector2{x: 3.0, y: 4.0}
+  ...> )
   %Collision.Vector.Vector2{x: -4.0, y: 3.0}
   """
   @spec right_normal(t) :: t
@@ -37,7 +54,9 @@ defmodule Collision.Vector.Vector2 do
 
   ## Examples
 
-  iex> Collision.Vector.Vector2.left_normal(%Collision.Vector.Vector2{x: 3.0, y: 4.0})
+  iex> Collision.Vector.Vector2.left_normal(
+  ...>   %Collision.Vector.Vector2{x: 3.0, y: 4.0}
+  ...> )
   %Collision.Vector.Vector2{x: 4.0, y: -3.0}
   """
   @spec left_normal(t) :: t
@@ -50,7 +69,10 @@ defmodule Collision.Vector.Vector2 do
 
   ## Examples
 
-  iex> Collision.Vector.Vector2.per_product(%Collision.Vector.Vector2{x: 3.0, y: 4.0}, %Collision.Vector.Vector2{x: -1.0, y: 2.0})
+  iex> Collision.Vector.Vector2.per_product(
+  ...>   %Collision.Vector.Vector2{x: 3.0, y: 4.0},
+  ...>   %Collision.Vector.Vector2{x: -1.0, y: 2.0}
+  ...> )
   -10.0
   """
   @spec per_product(t, t) :: float
