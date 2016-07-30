@@ -1,13 +1,17 @@
 # Collision
+[![Build Status](https://travis-ci.org/tpoulsen/collision.svg?branch=master)](https://travis-ci.org/tpoulsen/collision)
 
-Vector operations and collision detection.
+Vector operations and collision detection for polygons.
 
-## Not ready for use
+Implements the [separating axis theorem](https://en.wikipedia.org/wiki/Hyperplane_separation_theorem) for collision detection for polygons in 2D space.
+
+Using regular polygons with an arbitrary number of sides and of an artbitrary size, can detect collisions and calculate the minimum translation vector to resolve collision.
+
+### Under development.
 **TODO:**
 
-+ Add 3d vectors
-+ Collision detection algorithms
-  + Separating axis
++ Additional collision detection methods.
++ 3D collition detection
 
 
 ## Installation
