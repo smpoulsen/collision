@@ -68,6 +68,6 @@ defmodule Collision do
   """
   @spec two_dimensional_mtv(RegularPolygon.t, RegularPolygon.t) :: boolean
   def two_dimensional_mtv(polygon1, polygon2) do
-    SeparatingAxis.collision?(polygon1, polygon2)
+    SeparatingAxis.collision_mtv(polygon1, polygon2)
   end
 end

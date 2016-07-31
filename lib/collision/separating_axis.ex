@@ -24,7 +24,7 @@ defmodule Collision.SeparatingAxis do
   Returns: true | false
 
   ## Examples
-    iex> Collision.SeparatingAxis.collision?(
+    iex> SeparatingAxis.collision?(
     ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
     ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2, midpoint: %{x: 4, y: 4}}
     ...> )
@@ -46,14 +46,14 @@ defmodule Collision.SeparatingAxis do
   def collision?(p1, p2) do
     projections = collision_projections(p1, p2)
     Enum.all?(projections, fn zipped_projection ->
-      overlap(zipped_projection) || containment(zipped_projection)
+      overlap?(zipped_projection) || containment?(zipped_projection)
     end)
   end
 
   @doc """
   Checks for collision between two polygons and, if colliding, calculates
   the minimum translation vector to move out of collision. The float in the
-  return is the magnitude of overlap.
+  return is the magnitude of overlap?.
 
   Returns: nil | {%Vector2{}, float}
 
@@ -85,12 +85,12 @@ defmodule Collision.SeparatingAxis do
     axes_and_projections = Enum.zip(axes_to_test, zipped_projections)
     in_collision = axes_and_projections
     |> Enum.all?(fn {_axis, zipped_projection} ->
-      overlap(zipped_projection) || containment(zipped_projection)
+      overlap?(zipped_projection) || containment?(zipped_projection)
     end)
     if in_collision do
       axes_and_projections
       |> Enum.filter(fn {_axis, projection} ->
-        overlap(projection) || containment(projection)
+        overlap?(projection) || containment?(projection)
       end)
       |> minimum_overlap
     end
@@ -105,6 +105,7 @@ defmodule Collision.SeparatingAxis do
     |> Stream.chunk(2, 1, [Enum.at(vertices, 0)])
     |> Stream.map(fn [a, b] -> Vector2.from_points(a,b) end)
     |> Enum.map(&(Vector2.left_normal(&1)))
+    |> Enum.map(&(Vector.normalize(&1)))
   end
 
   # Project all of a polygon's edges onto the test axis and return
@@ -129,14 +130,14 @@ defmodule Collision.SeparatingAxis do
   end
 
   # Check whether a pair of lines are overlapping.
-  @spec overlap(axis) :: boolean
-  defp overlap({{min1, max1}, {min2, max2}}) do
+  @spec overlap?(axis) :: boolean
+  defp overlap?({{min1, max1}, {min2, max2}}) do
     !((min1 > max2) || (min2 > max1))
   end
 
   # Check whether a line is wholly contained within another.
-  @spec containment(axis) :: boolean
-  defp containment({{min1, max1}, {min2, max2}}) do
+  @spec containment?(axis) :: boolean
+  def containment?({{min1, max1}, {min2, max2}}) do
     line1_inside = min1 > min2 && max1 < max2
     line2_inside = min2 > min1 && max2 < max1
     line1_inside || line2_inside

@@ -8,12 +8,12 @@ defmodule Collision.Polygon.RegularPolygonTest do
   def polygon do
     domain(:polygon,
       fn(self, size) ->
-        {_, s} = :triq_dom.pick(non_neg_integer, size)
+        {_, s} = :triq_dom.pick(elements([3,4,5,6,7,8,9,10,11,12]), size)
         {_, r} = :triq_dom.pick(non_neg_integer, size)
         {_, a} = :triq_dom.pick(non_neg_integer, size)
         {_, x} = :triq_dom.pick(non_neg_integer, size)
         {_, y} = :triq_dom.pick(non_neg_integer, size)
-        {:ok, polygon} = RegularPolygon.from_tuple({max(s, 3), max(r, 1), a, {x, y}})
+        {:ok, polygon} = RegularPolygon.from_tuple({s, max(r, 1), a, {x, y}})
         {self, polygon}
       end, fn
         (self, polygon) ->
