@@ -187,7 +187,11 @@ defmodule Collision.Polygon.RegularPolygon do
 
   defimpl String.Chars, for: RegularPolygon do
     def to_string(%RegularPolygon{} = p) do
-      "%RegularPolygon{n_sides: #{p.n_sides}, radius: #{p.radius}, rotation_angle: #{p.rotation_angle}, midpoint: %{x: #{p.midpoint.x}, y: #{p.midpoint.y}}}"
+      "%RegularPolygon{
+        n_sides: #{p.n_sides}, radius: #{p.radius},
+        rotation_angle: #{p.rotation_angle},
+        midpoint: %{x: #{p.midpoint.x}, y: #{p.midpoint.y}}
+      }"
     end
   end
 

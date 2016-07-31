@@ -134,4 +134,10 @@ defmodule Collision.Vector.Vector2 do
       Vector2.right_normal(v1)
     end
   end
+
+  defimpl String.Chars, for: Vector2 do
+    def to_string(vector) do
+      "%Vector{x: #{vector.x}, y: #{vector.y}}"
+    end
+  end
 end
