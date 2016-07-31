@@ -103,6 +103,15 @@ defmodule Collision.SeparatingAxis do
     line2_inside = min2 > min1 && max2 < max1
     line1_inside || line2_inside
   end
+
+  # Check whether a polygon is entirely inside another.
+  defp total_containment?(axes) do
+    axes
+    |> Enum.all?(fn {_axis, projections} ->
+      containment?(projections)
+    end)
+  end
+
   # Calculate the magnitude of overlap for overlapping lines.
   @spec overlap_magnitude(axis) :: number
   def overlap_magnitude({{min1, max1}, {min2, max2}}) do
@@ -113,9 +122,20 @@ defmodule Collision.SeparatingAxis do
   # vector and magnitude to move the polygons out of collision.
   @spec minimum_overlap([{Vector2.t, axis}]) :: {Vector2.t, number}
   def minimum_overlap(axes) do
-    axes
-    |> Stream.map(fn {v, a} -> {v, overlap_magnitude(a)} end)
-    |> Enum.sort_by(fn {_v, a} -> a end)
+    overlap = if total_containment?(axes) do
+      axes
+      |> Enum.flat_map(fn {axis, {{min1, max1}, {min2, max2}} = projections} ->
+        [{axis, overlap_magnitude(projections) + abs(min1 - min2)},
+         {axis, overlap_magnitude(projections) + abs(max1 - max2)}]
+      end)
+    else
+      axes
+      |> Enum.map(fn {axis, projections} -> {axis, overlap_magnitude(projections)} end)
+    end
+    overlap
+    |> Enum.sort_by(fn {axis, magnitude} ->
+      magnitude
+    end)
     |> Enum.at(0)
   end
 

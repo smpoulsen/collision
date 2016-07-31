@@ -54,15 +54,4 @@ defmodule Collision.SeparatingAxisTest do
       end
     end
   end
-
-  property :translating_by_mtv_resolves_collision do
-    for_all {p1, p2} in such_that({pp1, pp2} in
-      {RegularPolygonTest.polygon, RegularPolygonTest.polygon}
-      when Collidable.collision?(pp1, pp2) && pp1 !== pp2
-    ) do
-      p1_vertices = RegularPolygon.calculate_vertices(p1)
-      {_p1, p2_translated} = Collidable.resolve_collision(p1, p2)
-      !Collidable.collision?(p1, p2_translated)
-    end
-  end
 end
