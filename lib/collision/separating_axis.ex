@@ -23,26 +23,8 @@ defmodule Collision.SeparatingAxis do
 
   Returns: true | false
 
-  ## Examples
-    iex> SeparatingAxis.collision?(
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2, midpoint: %{x: 4, y: 4}}
-    ...> )
-    false
-
-    iex> Collision.SeparatingAxis.collision?(
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 4,
-    ...>     midpoint: %{x: 4, y: 2}}
-    ...> )
-    true
   """
-  @spec collision?(polygon, polygon) :: boolean
-  def collision?(%RegularPolygon{} = p1, %RegularPolygon{} = p2) do
-    p1_vertices = RegularPolygon.calculate_vertices(p1)
-    p2_vertices = RegularPolygon.calculate_vertices(p2)
-    collision?(p1_vertices, p2_vertices)
-  end
+  @spec collision?([axis], [axis]) :: boolean
   def collision?(p1, p2) do
     projections = collision_projections(p1, p2)
     Enum.all?(projections, fn zipped_projection ->
@@ -57,28 +39,10 @@ defmodule Collision.SeparatingAxis do
 
   Returns: nil | {%Vector2{}, float}
 
-  ## Examples
-    iex> Collision.SeparatingAxis.collision_mtv(
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2, midpoint: %{x: 4, y: 4}}
-    ...> )
-    nil
-
-    iex> Collision.SeparatingAxis.collision_mtv(
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 4,
-    ...>     midpoint: %{x: 4, y: 1}}
-    ...> )
-    {%Collision.Vector.Vector2{x: 2.0, y: 2.0}, 2.0}
   """
   # TODO There is repetition between this and collision?, but it
   # runs faster this way. Refactoring opportunity in the future.
-  @spec collision_mtv(polygon, polygon) :: {Vector2.t, number}
-  def collision_mtv(%RegularPolygon{} = p1, %RegularPolygon{} = p2) do
-    p1_vertices = RegularPolygon.calculate_vertices(p1)
-    p2_vertices = RegularPolygon.calculate_vertices(p2)
-    collision_mtv(p1_vertices, p2_vertices)
-  end
+  @spec collision_mtv([axis], [axis]) :: {Vector2.t, number}
   def collision_mtv(p1, p2) do
     axes_to_test = test_axes(p1) ++ test_axes(p2)
     zipped_projections = collision_projections(p1, p2)
@@ -89,9 +53,6 @@ defmodule Collision.SeparatingAxis do
     end)
     if in_collision do
       axes_and_projections
-      |> Enum.filter(fn {_axis, projection} ->
-        overlap?(projection) || containment?(projection)
-      end)
       |> minimum_overlap
     end
   end
@@ -104,7 +65,7 @@ defmodule Collision.SeparatingAxis do
     vertices
     |> Stream.chunk(2, 1, [Enum.at(vertices, 0)])
     |> Stream.map(fn [a, b] -> Vector2.from_points(a,b) end)
-    |> Enum.map(&(Vector2.left_normal(&1)))
+    |> Stream.map(&(Vector2.left_normal(&1)))
     |> Enum.map(&(Vector.normalize(&1)))
   end
 
@@ -135,9 +96,9 @@ defmodule Collision.SeparatingAxis do
     !((min1 > max2) || (min2 > max1))
   end
 
-  # Check whether a line is wholly contained within another.
+  # Check whether a projection is wholly contained within another.
   @spec containment?(axis) :: boolean
-  def containment?({{min1, max1}, {min2, max2}}) do
+  defp containment?({{min1, max1}, {min2, max2}}) do
     line1_inside = min1 > min2 && max1 < max2
     line2_inside = min2 > min1 && max2 < max1
     line1_inside || line2_inside

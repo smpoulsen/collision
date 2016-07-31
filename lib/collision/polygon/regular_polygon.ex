@@ -9,6 +9,8 @@ defmodule Collision.Polygon.RegularPolygon do
   alias Collision.Polygon.RegularPolygon
   alias Collision.Polygon.Helper
   alias Collision.Polygon.Vertex
+  alias Collision.SeparatingAxis
+  alias Collision.Vector.Vector2
 
   @typedoc """
   A regular polygon is defined by a number of sides, a radius,
@@ -74,43 +76,51 @@ defmodule Collision.Polygon.RegularPolygon do
     rotation_angle = 2 * :math.pi / s
     vertices = 0..s - 1
     |> Enum.map(fn (n) ->
-      calculate_vertex(%{polygon | rotation_angle: rotation_angle}, n)
+      calculate_vertex(polygon, rotation_angle, n)
     end)
-    rotate_polygon(vertices, a)
+    |> rotate_polygon(a, polygon.midpoint)
   end
 
   # Find the vertex of a side of a regular polygon given the polygon struct
   # and an integer representing a side.
-  @spec calculate_vertex(RegularPolygon.t, integer) :: Vertex.t
+  @spec calculate_vertex(RegularPolygon.t, number, integer) :: Vertex.t
   defp calculate_vertex(
         %RegularPolygon{
           radius: r,
           rotation_angle: a,
           midpoint: %{x: x, y: y}
-        }, i) do
-    x1 = x + r * :math.cos(i * a)
-    y1 = y + r * :math.sin(i * a)
-    {Float.round(x1, 2), Float.round(y1, 2)}
+        }, angle, i) do
+    x1 = x + r * :math.cos(i * angle)
+    y1 = y + r * :math.sin(i * angle)
+    {x1, y1}
   end
 
   @doc """
   Translate a polygon in cartesian space.
 
-  ## Examples
-    iex(1)> p = Collision.two_dimensional_polygon(4, 3, 0, {0,0})
-    %Collision.Polygon.RegularPolygon{midpoint: %Collision.Polygon.Vertex{x: 0, y: 0},
-    n_sides: 4, radius: 3, rotation_angle: 0.0}
-    iex(2)> Collision.Polygon.RegularPolygon.calculate_vertices(p)
-    [{3.0, 0.0}, {0.0, 3.0}, {-3.0, 0.0}, {0.0, -3.0}]
-    iex(3)> Collision.Polygon.RegularPolygon.translate_polygon(p, %{x: -2, y: +2})
-    [{1.0, 2.0}, {-2.0, 5.0}, {-5.0, 2.0}, {-2.0, -1.0}]
   """
-  @spec translate_polygon([Vertex.t] | RegularPolygon.t, Vertex.t) :: [Vertex.t]
+  @spec translate_polygon([Vertex.t] | RegularPolygon.t, Vertex.t) :: [Vertex.t] | RegularPolygon.t
   def translate_polygon(%RegularPolygon{} = p, %{x: _x, y: _y} = c) do
-    polygon_vertices = calculate_vertices(p)
-    translate_polygon(polygon_vertices, c)
+    new_midpoint = translate_midpoint(c).(p.midpoint)
+    %{p | midpoint: new_midpoint}
   end
-  def translate_polygon(polygon_vertices, %{x: _x, y: _y} = translation) do
+  defp translate_midpoint(%{x: x_translate, y: y_translate}) do
+    fn %{x: x, y: y} -> %Vertex{x: x + x_translate, y: y + y_translate} end
+  end
+
+
+  @doc """
+  Translate a polygon's vertices.
+
+  ## Examples
+  iex(1)> p = Collision.two_dimensional_polygon(4, 3, 0, {0,0})
+  %Collision.Polygon.RegularPolygon{midpoint: %Collision.Polygon.Vertex{x: 0, y: 0},
+  n_sides: 4, radius: 3, rotation_angle: 0.0}
+  iex(2)> Collision.Polygon.RegularPolygon.translate_polygon(p, %{x: -2, y: 2})
+  %Collision.Polygon.RegularPolygon{midpoint: %Collision.Polygon.Vertex{x: -2, y: 2},
+  n_sides: 4, radius: 3, rotation_angle: 0.0}
+  """
+  def translate_vertices(polygon_vertices, %{x: _x, y: _y} = translation) do
     Enum.map(polygon_vertices, translate_vertex(translation))
   end
   defp translate_vertex(%{x: x_translate, y: y_translate}) do
@@ -125,11 +135,11 @@ defmodule Collision.Polygon.RegularPolygon do
     iex(1)> p = Collision.two_dimensional_polygon(4, 3, 0, {0,0})
     %Collision.Polygon.RegularPolygon{midpoint: %Collision.Polygon.Vertex{x: 0,
     y: 0}, n_sides: 4, radius: 3, rotation_angle: 0.0}
-    iex(2)> Collision.Polygon.RegularPolygon.calculate_vertices(p)
+    iex(2)> vertices = Collision.Polygon.RegularPolygon.calculate_vertices(p)
     [{3.0, 0.0}, {0.0, 3.0}, {-3.0, 0.0}, {0.0, -3.0}]
-    iex(3)> Collision.Polygon.RegularPolygon.rotate_polygon_degrees(p, 180)
+    iex(3)> Collision.Polygon.RegularPolygon.rotate_polygon_degrees(vertices, 180)
     [{-3.0, 0.0}, {0.0, -3.0}, {3.0, 0.0}, {0.0, 3.0}]
-    iex(4)> Collision.Polygon.RegularPolygon.rotate_polygon_degrees(p, 360)
+    iex(4)> Collision.Polygon.RegularPolygon.rotate_polygon_degrees(vertices, 360)
     [{3.0, 0.0}, {0.0, 3.0}, {-3.0, 0.0}, {0.0, -3.0}]
   """
   @spec rotate_polygon_degrees([Vertex.t] | RegularPolygon.t, degrees) :: [Vertex.t]
@@ -145,20 +155,16 @@ defmodule Collision.Polygon.RegularPolygon do
     iex(1)> p = Collision.two_dimensional_polygon(4, 3, 0, {0,0})
     %Collision.Polygon.RegularPolygon{midpoint: %Collision.Polygon.Vertex{x: 0,
     y: 0}, n_sides: 4, radius: 3, rotation_angle: 0.0}
-    iex(2)> Collision.Polygon.RegularPolygon.rotate_polygon(p, 3.14)
+    iex(2)> v = Collision.Polygon.RegularPolygon.calculate_vertices(p)
+    iex(3)> Collision.Polygon.RegularPolygon.rotate_polygon(v, 3.14)
     [{-3.0, 0.0}, {0.0, -3.0}, {3.0, 0.0}, {0.0, 3.0}]
   """
-  @spec rotate_polygon([Vertex.t] | RegularPolygon.t, radians) :: [Vertex.t]
-  def rotate_polygon(%RegularPolygon{} = p, radians) do
-    p
-    |> translate_polygon(%{x: -p.midpoint.x, y: -p.midpoint.y})
-    |> rotate_polygon(radians)
-    |> translate_polygon(p.midpoint)
-  end
-  def rotate_polygon(vertices, radians) do
+  def rotate_polygon(vertices, radians, rotation_point \\ %{x: 0, y: 0}) do
     rotated = fn {x, y} ->
-      x_term = x * :math.cos(radians) - y * :math.sin(radians)
-      y_term = x * :math.sin(radians) + y * :math.cos(radians)
+      x_offset = x - rotation_point.x
+      y_offset = y - rotation_point.y
+      x_term = rotation_point.x + (x_offset * :math.cos(radians) - y_offset * :math.sin(radians))
+      y_term = rotation_point.y + (x_offset * :math.sin(radians) + y_offset * :math.cos(radians))
       {Float.round(x_term, 2), Float.round(y_term, 2)}
     end
     Enum.map(vertices, fn vertex -> rotated.(vertex) end)
@@ -198,9 +204,20 @@ defmodule Collision.Polygon.RegularPolygon do
       SeparatingAxis.collision_mtv(p1_vertices, p2_vertices)
     end
 
+    @spec resolve_collision(RegularPolygon.t, RegularPolygon.t) :: {RegularPolygon.t, RegularPolygon.t}
     def resolve_collision(%RegularPolygon{} = p1, %RegularPolygon{} = p2) do
       {mtv, magnitude} = resolution(p1, p2)
-      SeparatingAxis.resolve_collision(%{mtv: mtv, magnitude: magnitude, p1: p1, p2: p2})
+      vector_from_p1_to_p2 = %Vector2{
+        x: p2.midpoint.x - p1.midpoint.x,
+        y: p2.midpoint.y - p1.midpoint.y}
+      translation_vector =
+        case Vector.dot_product(mtv, vector_from_p1_to_p2) do
+          x when x < 0 ->
+            Vector.scalar_mult(mtv, -1 * magnitude)
+          _ ->
+            Vector.scalar_mult(mtv, magnitude)
+        end
+      {p1, RegularPolygon.translate_polygon(p2, translation_vector)}
     end
   end
 end
