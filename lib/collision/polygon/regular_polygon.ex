@@ -178,4 +178,29 @@ defmodule Collision.Polygon.RegularPolygon do
       {Float.round(x, 5), Float.round(y, 5)}
     end)
   end
+
+  defimpl String.Chars, for: RegularPolygon do
+    def to_string(%RegularPolygon{} = p) do
+      "%RegularPolygon{n_sides: #{p.n_sides}, radius: #{p.radius}, rotation_angle: #{p.rotation_angle}, midpoint: %{x: #{p.midpoint.x}, y: #{p.midpoint.y}}}"
+    end
+  end
+
+  defimpl Collidable, for: RegularPolygon do
+    def collision?(polygon1, polygon2) do
+      p1_vertices = RegularPolygon.calculate_vertices(polygon1)
+      p2_vertices = RegularPolygon.calculate_vertices(polygon2)
+      SeparatingAxis.collision?(p1_vertices, p2_vertices)
+    end
+
+    def resolution(%RegularPolygon{} = p1, %RegularPolygon{} = p2) do
+      p1_vertices = RegularPolygon.calculate_vertices(p1)
+      p2_vertices = RegularPolygon.calculate_vertices(p2)
+      SeparatingAxis.collision_mtv(p1_vertices, p2_vertices)
+    end
+
+    def resolve_collision(%RegularPolygon{} = p1, %RegularPolygon{} = p2) do
+      {mtv, magnitude} = resolution(p1, p2)
+      SeparatingAxis.resolve_collision(%{mtv: mtv, magnitude: magnitude, p1: p1, p2: p2})
+    end
+  end
 end
