@@ -13,9 +13,9 @@ defmodule Collision do
 
   ## Examples
 
-    iex> Collision.two_dimensional_polygon(4, 2, 0, {0, 0})
-    %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2,
-    rotation_angle: 0.0, midpoint: %Collision.Polygon.Vertex{x: 0, y: 0}}
+      iex> Collision.two_dimensional_polygon(4, 2, 0, {0, 0})
+      %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2,
+      rotation_angle: 0.0, midpoint: %Collision.Polygon.Vertex{x: 0, y: 0}}
 
   """
   @spec two_dimensional_polygon(integer, integer, number, {number, number}) :: RegularPolygon.t
@@ -31,18 +31,18 @@ defmodule Collision do
 
   ## Examples
 
-    iex> Collision.two_dimensional_collision?(
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2, midpoint: %{x: 4, y: 4}}
-    ...> )
-    false
+      iex> Collision.two_dimensional_collision?(
+      ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
+      ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2, midpoint: %{x: 4, y: 4}}
+      ...> )
+      false
 
-    iex> Collision.two_dimensional_collision?(
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 4,
-    ...>     midpoint: %{x: 4, y: 2}}
-    ...> )
-    true
+      iex> Collision.two_dimensional_collision?(
+      ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
+      ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 4,
+      ...>     midpoint: %{x: 4, y: 2}}
+      ...> )
+      true
 
   """
   @spec two_dimensional_collision?(RegularPolygon.t, RegularPolygon.t) :: boolean
@@ -58,18 +58,18 @@ defmodule Collision do
 
   ## Examples
 
-    iex> Collision.SeparatingAxis.collision_mtv(
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2, midpoint: %{x: 4, y: 4}}
-    ...> )
-    nil
+      iex> Collision.SeparatingAxis.collision_mtv(
+      ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
+      ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2, midpoint: %{x: 4, y: 4}}
+      ...> )
+      nil
 
-    iex> Collision.SeparatingAxis.collision_mtv(
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 4,
-    ...>     midpoint: %{x: 4, y: 1}}
-    ...> )
-    {%Collision.Vector.Vector2{x: 2.0, y: 2.0}, 2.0}
+      iex> Collision.SeparatingAxis.collision_mtv(
+      ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
+      ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 4,
+      ...>     midpoint: %{x: 4, y: 1}}
+      ...> )
+      {%Collision.Vector.Vector2{x: 2.0, y: 2.0}, 2.0}
 
   """
   @spec two_dimensional_mtv(RegularPolygon.t, RegularPolygon.t) :: boolean

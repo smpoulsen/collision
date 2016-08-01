@@ -8,18 +8,18 @@ defprotocol Collidable do
 
   ## Examples
 
-    iex> Collidable.collision?(
+      iex> Collidable.collision?(
       ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
       ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2, midpoint: %{x: 4, y: 4}}
       ...> )
-    false
+      false
 
-    iex> Collidable.SeparatingAxis.collision?(
+      iex> Collidable.SeparatingAxis.collision?(
       ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
       ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 4,
       ...>     midpoint: %{x: 4, y: 2}}
       ...> )
-    true
+      true
 
   """
   def collision?(any, any)
@@ -31,18 +31,18 @@ defprotocol Collidable do
 
   ## Examples
 
-    iex> Collidable.resolution(
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2, midpoint: %{x: 4, y: 4}}
-    ...> )
-    nil
+      iex> Collidable.resolution(
+      ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
+      ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2, midpoint: %{x: 4, y: 4}}
+      ...> )
+      nil
 
-    iex> Collidable.resolution(
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 4,
-    ...>     midpoint: %{x: 4, y: 1}}
-    ...> )
-    {%Collision.Vector.Vector2{x: 0.7071067811865475, y: 0.7071067811865475}, 0.7071067811865475}
+      iex> Collidable.resolution(
+      ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
+      ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 4,
+      ...>     midpoint: %{x: 4, y: 1}}
+      ...> )
+      {%Collision.Vector.Vector2{x: 0.7071067811865475, y: 0.7071067811865475}, 0.7071067811865475}
 
   """
   def resolution(any, any)
@@ -56,18 +56,18 @@ defprotocol Collidable do
 
   ## Examples
 
-  iex> Collidable.resolve_collision(
-  ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-  ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2, midpoint: %{x: 4, y: 4}}
-  ...> )
-  nil
+    iex> Collidable.resolve_collision(
+    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
+    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2, midpoint: %{x: 4, y: 4}}
+    ...> )
+    nil
 
-  iex> Collidable.resolve_collision(
-  ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-  ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 4,
-  ...>     midpoint: %{x: 4, y: 1}}
-  ...> )
-  {%Collision.Vector.Vector2{x: 0.7071067811865475, y: 0.7071067811865475}, 0.7071067811865475}
+    iex> Collidable.resolve_collision(
+    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
+    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 4,
+    ...>     midpoint: %{x: 4, y: 1}}
+    ...> )
+    {%Collision.Vector.Vector2{x: 0.7071067811865475, y: 0.7071067811865475}, 0.7071067811865475}
 
   """
   def resolve_collision(any, any)

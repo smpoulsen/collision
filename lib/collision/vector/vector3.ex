@@ -12,8 +12,8 @@ defmodule Collision.Vector.Vector3 do
 
   ## Examples
 
-    iex> Collision.Vector.Vector3.from_tuple({1.0, 1.5, 2.0})
-    %Collision.Vector.Vector3{x: 1.0, y: 1.5, z: 2.0}
+      iex> Collision.Vector.Vector3.from_tuple({1.0, 1.5, 2.0})
+      %Collision.Vector.Vector3{x: 1.0, y: 1.5, z: 2.0}
 
   """
   @spec from_tuple({float, float, float}) :: t
@@ -24,11 +24,11 @@ defmodule Collision.Vector.Vector3 do
 
   ## Examples
 
-    iex> Collision.Vector.Vector3.cross_product(
-    ...>   %Collision.Vector.Vector3{x: 2.0, y: 1.0, z: -1.0},
-    ...>   %Collision.Vector.Vector3{x: -3.0, y: 4.0, z: 1}
-    ...> )
-    %Collision.Vector.Vector3{x: 5.0, y: 1.0, z: 11.0}
+      iex> Collision.Vector.Vector3.cross_product(
+      ...>   %Collision.Vector.Vector3{x: 2.0, y: 1.0, z: -1.0},
+      ...>   %Collision.Vector.Vector3{x: -3.0, y: 4.0, z: 1}
+      ...> )
+      %Collision.Vector.Vector3{x: 5.0, y: 1.0, z: 11.0}
 
   """
   @spec cross_product(t, t) :: t
