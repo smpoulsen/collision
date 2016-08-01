@@ -3,7 +3,7 @@ defmodule Collision.Mixfile do
 
   def project do
     [app: :collision,
-     version: "0.1.0",
+     version: "0.2.0",
      elixir: "~> 1.3",
      description: description(),
      package: package(),
@@ -25,6 +25,7 @@ defmodule Collision.Mixfile do
       {:dialyxir, "~> 0.3.3", only: [:dev, :test]},
       {:excheck, "~> 0.4.1", only: :test},
       {:triq, github: "krestenkrab/triq", only: :test},
+      {:ex_doc, ">= 0.0.0", only: :dev}
     ]
   end
 
@@ -38,7 +39,10 @@ defmodule Collision.Mixfile do
     [
       licenses: ["BSD2"],
       maintainers: ["Travis Poulsen"],
-      links: %{"Github" => "https://github.com/tpoulsen/collision"}
+      links: %{
+        "Github" => "https://github.com/tpoulsen/collision",
+        "Docs" => "https://hexdocs.pm/collision/"
+      }
     ]
   end
 end
