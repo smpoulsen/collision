@@ -8,12 +8,12 @@ defmodule Collision.Polygon.RegularPolygonTest do
   def polygon do
     domain(:polygon,
       fn(self, size) ->
-        {_, s} = :triq_dom.pick(non_neg_integer, size)
-        {_, r} = :triq_dom.pick(non_neg_integer, size)
+        {_, s} = :triq_dom.pick(elements([3,4,5,6,7,8,9,10,11,12]), size)
+        {_, r} = :triq_dom.pick(choose(1, 50), size)
         {_, a} = :triq_dom.pick(non_neg_integer, size)
         {_, x} = :triq_dom.pick(non_neg_integer, size)
         {_, y} = :triq_dom.pick(non_neg_integer, size)
-        {:ok, polygon} = RegularPolygon.from_tuple({max(s, 3), max(r, 1), a, {x, y}})
+        {:ok, polygon} = RegularPolygon.from_tuple({s, max(r, 1), a, {x, y}})
         {self, polygon}
       end, fn
         (self, polygon) ->
@@ -44,19 +44,31 @@ defmodule Collision.Polygon.RegularPolygonTest do
     end
   end
 
-  # Test is failing due to a rounding error somewhere.
-  #property :polygon_has_order_n_rotational_symmetry do
-  #  for_all p in such_that(p in polygon when p.radius > 0) do
-  #    vertices = p
-  #    |> RegularPolygon.calculate_vertices
-  #    |> RegularPolygon.round_vertices
-  #    |> MapSet.new
-  #    radians = 2 * :math.pi / p.n_sides
-  #    rotated_polygon = p
-  #    |> RegularPolygon.rotate_polygon(radians)
-  #    |> RegularPolygon.round_vertices
-  #    |> MapSet.new
-  #    MapSet.equal?(vertices, rotated_polygon)
-  #  end
-  #end
+  property :translating_by_mtv_resolves_collision do
+    for_all {p1, p2} in such_that({pp1, pp2} in {polygon, polygon}
+      when Collidable.collision?(pp1, pp2)) do
+      {_p1, p2_translated} = Collidable.resolve_collision(p1, p2)
+      mtv = Collidable.resolution(p1, p2_translated)
+      case mtv do
+        nil -> true
+        {_vector, magnitude} ->
+          round(magnitude) == 0
+      end
+    end
+  end
+
+  property :translation_is_same_for_polygon_and_vertices do
+    for_all {p, x, y} in {polygon, int, int} do
+      polygon_translated = p
+      |> RegularPolygon.translate_polygon(%{x: x, y: y})
+      |> RegularPolygon.calculate_vertices
+      |> RegularPolygon.round_vertices
+      vertices_translated = p
+      |> RegularPolygon.calculate_vertices
+      |> RegularPolygon.translate_vertices(%{x: x, y: y})
+      |> RegularPolygon.round_vertices
+      polygon_translated == vertices_translated
+    end
+  end
+
 end

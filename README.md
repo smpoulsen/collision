@@ -7,11 +7,13 @@ Implements the [separating axis theorem](https://en.wikipedia.org/wiki/Hyperplan
 
 Using regular polygons with an arbitrary number of sides and of an artbitrary size, can detect collisions and calculate the minimum translation vector to resolve collision.
 
+[Documentation](https://hexdocs.pm/collision/)
+
 ### Under development.
 **TODO:**
 
 + Additional collision detection methods.
-+ 3D collition detection
++ 3D collision detection
 
 
 ## Installation
