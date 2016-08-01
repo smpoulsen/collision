@@ -18,8 +18,10 @@ defprotocol Vector do
   Convert a vector to a tuple.
 
   ## Examples
+
     iex> Vector.to_tuple(%Collision.Vector2{x: 1.0, y: 1.5})
     {1.0, 1.5}
+
   """
   def to_tuple(vector)
 
@@ -27,8 +29,10 @@ defprotocol Vector do
   Round all the vector components to n decimal places.
 
   ## Examples
+
     iex> Vector.round_components(%Vector2{x: 1.32342, y: 4.23231}, 2)
     %Vector2{x: 1.32, y: 4.23}
+
   """
   def round_components(vector, integer)
 
@@ -36,6 +40,7 @@ defprotocol Vector do
   Multiple a vector by a scalar value.
 
   ## Examples
+
     iex> Vector.scalar_mult(%Collision.Vector2{x: 5.0, y: 2.0}, -1)
     %Collision.Vector2{x: -5.0, y: -2.0}
   """
@@ -45,8 +50,10 @@ defprotocol Vector do
   Add two vectors together.
 
   ## Examples
+
     iex> Vector.add(%Collision.Vector2{x: 1.0, y: 1.0}, %Collision.Vector2{x: 2.0, y: 2.0})
     %Collision.Vector2{x: 3.0, y: 3.0}
+
   """
   def add(vector, vector)
 
@@ -54,8 +61,10 @@ defprotocol Vector do
   Subtract two vectors.
 
   ## Examples
+
     iex> Vector.subtract(%Collision.Vector2{x: 4.0, y: 1.0}, %Collision.Vector2{x: 1.0, y: 4.0})
     %Collision.Vector2{x: 3.0, y: -3.0}
+
   """
   def subtract(vector, vector)
 
@@ -63,8 +72,10 @@ defprotocol Vector do
   Calculate the magnitude of a vector.
 
   ## Examples
+
     iex> Vector.magnitude(%Collision.Vector2{x: 3.0, y: 4.0})
     5.0
+
   """
   def magnitude(vector)
 
@@ -72,8 +83,10 @@ defprotocol Vector do
   Calculate the squared magnitude of a vector.
 
   ## Examples
+
     iex> Vector.magnitude(%Collision.Vector2{x: 3.0, y: 4.0})
     25.0
+
   """
   def magnitude_squared(vector)
 
@@ -81,8 +94,10 @@ defprotocol Vector do
   Normalize a vector.
 
   ## Examples
+
     iex> Vector.normalize(%Collision.Vector2{x: 3.0, y: 4.0})
     %Collision.Vector2{x: 0.6, y: 0.8}
+
   """
   def normalize(vector)
 
@@ -93,8 +108,10 @@ defprotocol Vector do
   positive towards.
 
   ## Examples
+
     iex> Vector.dot_product(%Collision.Vector2{x: 3.0, y: 4.0}, %Collision.Vector2{x: -1.0, y: 2.0})
     5.0
+
   """
   def dot_product(vector, vector)
 
@@ -102,8 +119,10 @@ defprotocol Vector do
   Project a vector, v1, onto another, v2.
 
   ## Examples
+
     iex> Vector.projection(%Collision.Vector2{x: 3.0, y: 4.0}, %Collision.Vector2{x: -1.0, y: 2.0})
     %Collision.Vector2{x: -2.23606797749979, y: 4.47213595499958}
+
   """
   def projection(vector, vector)
 end

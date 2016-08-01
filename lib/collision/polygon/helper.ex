@@ -11,8 +11,10 @@ defmodule Collision.Polygon.Helper do
   angles in radians.
 
   ## Examples
+
     iex> Collision.Polygon.Helper.degrees_to_radians(180)
     :math.pi
+
   """
   @spec degrees_to_radians(degrees) :: radians
   def degrees_to_radians(degrees) do

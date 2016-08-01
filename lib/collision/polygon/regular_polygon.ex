@@ -1,7 +1,7 @@
 defmodule Collision.Polygon.RegularPolygon do
   @moduledoc """
-  A regular polygon is equiangular and equilateral, having all
-  angles and all sides be equal respectively. With enough sides,
+  A regular polygon is equiangular and equilateral -- all
+  angles and all sides be equal. With enough sides,
   a regular polygon tends toward a circle.
   """
   defstruct n_sides: 3, radius: 0, rotation_angle: 0.0, midpoint: %{x: 0, y: 0}
@@ -13,13 +13,13 @@ defmodule Collision.Polygon.RegularPolygon do
   alias Collision.Vector.Vector2
 
   @typedoc """
-  A regular polygon is defined by a number of sides, a radius,
+  A regular polygon is defined by a number of sides, a circumradius,
   a rotation angle, and a center point `{x, y}`.
   """
   @type t :: Collision.Polygon.RegularPolygon.t
   @type axis :: {Vertex.t, Vertex.t}
-  @type degrees :: number
-  @type radians :: number
+  @typep degrees :: number
+  @typep radians :: number
 
   @doc """
   Construct a regular polygon from a tuple.
@@ -27,25 +27,19 @@ defmodule Collision.Polygon.RegularPolygon do
   A polygon must have at least three sides.
 
   ## Examples
-    iex> Collision.Polygon.RegularPolygon.from_tuple({0, 0, 0, {0, 0}})
-    {:error, :polygon_must_have_at_least_three_sides}
 
     iex> Collision.Polygon.RegularPolygon.from_tuple({3, 2, 0, {0, 0}})
     {:ok, %Collision.Polygon.RegularPolygon{n_sides: 3, radius: 2,
     rotation_angle: 0.0, midpoint: %Collision.Polygon.Vertex{x: 0, y: 0}}}
+
   """
   @spec from_tuple({integer, number, number, {number, number}}, atom) :: RegularPolygon.t
   def from_tuple({s, _r, _a, {_x, _y}}, _d) when s < 3 do
-    {:error, :polygon_must_have_at_least_three_sides}
+    {:error, "Polygon must have at least three sides"}
   end
   def from_tuple({s, r, a, {x, y}}, :degrees) do
     angle_in_radians = Float.round(Helper.degrees_to_radians(a), 5)
-    {:ok, %RegularPolygon{
-      n_sides: s,
-      radius: r,
-      rotation_angle: angle_in_radians,
-      midpoint: %Vertex{x: x, y: y}
-    }}
+    from_tuple({s, r, angle_in_radians, {x, y}}, :radians)
   end
   def from_tuple({s, r, a, {x, y}}, :radians) do
     {:ok, %RegularPolygon{
@@ -60,13 +54,14 @@ defmodule Collision.Polygon.RegularPolygon do
   @doc """
   Determine the vertices, or points, of the polygon.
 
-  ## Example
+  ## Examples
 
-  iex> Collision.Polygon.RegularPolygon.calculate_vertices(
-  ...>   %Collision.Polygon.RegularPolygon{
-  ...>     n_sides: 4, radius: 2, rotation_angle: 0, midpoint: %{x: 2, y: 0}
-  ...>   })
-  [{4.0, 0.0}, {2.0, 2.0}, {0.0, 0.0}, {2.0, -2.0}]
+    iex> Collision.Polygon.RegularPolygon.calculate_vertices(
+    ...>   %Collision.Polygon.RegularPolygon{
+    ...>     n_sides: 4, radius: 2, rotation_angle: 0, midpoint: %{x: 2, y: 0}
+    ...>   })
+    [{4.0, 0.0}, {2.0, 2.0}, {0.0, 0.0}, {2.0, -2.0}]
+
   """
   @spec calculate_vertices(t) :: [Vertex.t]
   def calculate_vertices(%RegularPolygon{n_sides: s}) when s < 3 do
@@ -74,7 +69,7 @@ defmodule Collision.Polygon.RegularPolygon do
   end
   def calculate_vertices(%RegularPolygon{n_sides: s, rotation_angle: a} = polygon) do
     rotation_angle = 2 * :math.pi / s
-    vertices = 0..s - 1
+    0..s - 1
     |> Enum.map(fn (n) ->
       calculate_vertex(polygon, rotation_angle, n)
     end)
@@ -87,7 +82,6 @@ defmodule Collision.Polygon.RegularPolygon do
   defp calculate_vertex(
         %RegularPolygon{
           radius: r,
-          rotation_angle: a,
           midpoint: %{x: x, y: y}
         }, angle, i) do
     x1 = x + r * :math.cos(i * angle)
@@ -113,12 +107,14 @@ defmodule Collision.Polygon.RegularPolygon do
   Translate a polygon's vertices.
 
   ## Examples
-  iex(1)> p = Collision.two_dimensional_polygon(4, 3, 0, {0,0})
-  %Collision.Polygon.RegularPolygon{midpoint: %Collision.Polygon.Vertex{x: 0, y: 0},
-  n_sides: 4, radius: 3, rotation_angle: 0.0}
-  iex(2)> Collision.Polygon.RegularPolygon.translate_polygon(p, %{x: -2, y: 2})
-  %Collision.Polygon.RegularPolygon{midpoint: %Collision.Polygon.Vertex{x: -2, y: 2},
-  n_sides: 4, radius: 3, rotation_angle: 0.0}
+
+    iex(1)> p = Collision.two_dimensional_polygon(4, 3, 0, {0,0})
+    %Collision.Polygon.RegularPolygon{midpoint: %Collision.Polygon.Vertex{x: 0, y: 0},
+    n_sides: 4, radius: 3, rotation_angle: 0.0}
+    iex(2)> Collision.Polygon.RegularPolygon.translate_polygon(p, %{x: -2, y: 2})
+    %Collision.Polygon.RegularPolygon{midpoint: %Collision.Polygon.Vertex{x: -2, y: 2},
+    n_sides: 4, radius: 3, rotation_angle: 0.0}
+
   """
   def translate_vertices(polygon_vertices, %{x: _x, y: _y} = translation) do
     Enum.map(polygon_vertices, translate_vertex(translation))
@@ -132,6 +128,7 @@ defmodule Collision.Polygon.RegularPolygon do
   Rotate a regular polygon using rotation angle in degrees.
 
   ## Examples
+
     iex(1)> p = Collision.two_dimensional_polygon(4, 3, 0, {0,0})
     %Collision.Polygon.RegularPolygon{midpoint: %Collision.Polygon.Vertex{x: 0,
     y: 0}, n_sides: 4, radius: 3, rotation_angle: 0.0}
@@ -141,6 +138,7 @@ defmodule Collision.Polygon.RegularPolygon do
     [{-3.0, 0.0}, {0.0, -3.0}, {3.0, 0.0}, {0.0, 3.0}]
     iex(4)> Collision.Polygon.RegularPolygon.rotate_polygon_degrees(vertices, 360)
     [{3.0, 0.0}, {0.0, 3.0}, {-3.0, 0.0}, {0.0, -3.0}]
+
   """
   @spec rotate_polygon_degrees([Vertex.t] | RegularPolygon.t, degrees) :: [Vertex.t]
   def rotate_polygon_degrees(vertices, degrees) do
@@ -152,13 +150,16 @@ defmodule Collision.Polygon.RegularPolygon do
   Rotate a regular polygon, rotation angle should be radians.
 
   ## Examples
+
     iex(1)> p = Collision.two_dimensional_polygon(4, 3, 0, {0,0})
     %Collision.Polygon.RegularPolygon{midpoint: %Collision.Polygon.Vertex{x: 0,
     y: 0}, n_sides: 4, radius: 3, rotation_angle: 0.0}
     iex(2)> v = Collision.Polygon.RegularPolygon.calculate_vertices(p)
     iex(3)> Collision.Polygon.RegularPolygon.rotate_polygon(v, 3.14)
     [{-3.0, 0.0}, {0.0, -3.0}, {3.0, 0.0}, {0.0, 3.0}]
+
   """
+  @spec rotate_polygon([Vertex.t], radians, %{x: number, y: number}) :: [Vertex.t]
   def rotate_polygon(vertices, radians, rotation_point \\ %{x: 0, y: 0}) do
     rotated = fn {x, y} ->
       x_offset = x - rotation_point.x
@@ -174,8 +175,10 @@ defmodule Collision.Polygon.RegularPolygon do
   Rounds the x and y components of an {x, y} tuple.
 
   ## Examples
+
     iex> Collision.Polygon.RegularPolygon.round_vertices([{1.55555555, 1.2222222}])
     [{1.55556, 1.22222}]
+
   """
   @spec round_vertices([{number, number}]) :: [{number, number}]
   def round_vertices(vertices) do
