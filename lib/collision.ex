@@ -3,7 +3,7 @@ defmodule Collision do
   Wrapper around functionality to generate polygons and test for collisions.
   """
   alias Collision.Polygon.RegularPolygon
-  alias Collision.SeparatingAxis
+  alias Collision.Detection.SeparatingAxis
 
   @doc """
   Create a two dimensional, regular polygon from a number of sides,

@@ -1,6 +1,8 @@
 defprotocol Collidable do
   @moduledoc """
+  Protocol defining an interface for checking whether objects are colliding.
 
+  In the event of collision, it also defines functions for resolution.
   """
 
   @doc """

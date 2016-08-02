@@ -1,10 +1,10 @@
-defmodule Collision.SeparatingAxisTest do
+defmodule Collision.Detection.SeparatingAxisTest do
   use ExUnit.Case
   use ExCheck
-  alias Collision.SeparatingAxis
+  alias Collision.Detection.SeparatingAxis
   alias Collision.Polygon.RegularPolygon
   alias Collision.Polygon.RegularPolygonTest
-  doctest Collision.SeparatingAxis
+  doctest Collision.Detection.SeparatingAxis
 
   # Generator for RegularPolygon values
   def polygon_at_origin do

@@ -1,4 +1,4 @@
-defmodule Collision.SeparatingAxis do
+defmodule Collision.Detection.SeparatingAxis do
   @moduledoc """
   Implements the separating axis theorem for collision detection.
 
