@@ -9,7 +9,7 @@ defmodule Collision.Polygon.RegularPolygon do
   alias Collision.Polygon.RegularPolygon
   alias Collision.Polygon.Helper
   alias Collision.Polygon.Vertex
-  alias Collision.SeparatingAxis
+  alias Collision.Detection.SeparatingAxis
   alias Collision.Vector.Vector2
 
   @typedoc """
@@ -190,10 +190,7 @@ defmodule Collision.Polygon.RegularPolygon do
 
   defimpl String.Chars, for: RegularPolygon do
     def to_string(%RegularPolygon{} = p) do
-      "%RegularPolygon{
-        n_sides: #{p.n_sides}, radius: #{p.radius},
-        rotation_angle: #{p.rotation_angle},
-        midpoint: %{x: #{p.midpoint.x}, y: #{p.midpoint.y}}
+      "%RegularPolygon{n_sides: #{p.n_sides}, radius: #{p.radius}, rotation_angle: #{p.rotation_angle}, midpoint: %{x: #{p.midpoint.x}, y: #{p.midpoint.y}}
       }"
     end
   end

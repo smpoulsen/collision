@@ -43,6 +43,7 @@ defprotocol Vector do
 
     iex> Vector.scalar_mult(%Collision.Vector2{x: 5.0, y: 2.0}, -1)
     %Collision.Vector2{x: -5.0, y: -2.0}
+
   """
   def scalar_mult(vector, scalar)
 

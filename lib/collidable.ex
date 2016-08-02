@@ -1,6 +1,8 @@
 defprotocol Collidable do
   @moduledoc """
+  Protocol defining an interface for checking whether objects are colliding.
 
+  In the event of collision, it also defines functions for resolution.
   """
 
   @doc """
@@ -14,7 +16,7 @@ defprotocol Collidable do
       ...> )
     false
 
-    iex> Collidable.SeparatingAxis.collision?(
+    iex> Collidable.collision?(
       ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
       ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 4,
       ...>     midpoint: %{x: 4, y: 2}}
@@ -56,18 +58,18 @@ defprotocol Collidable do
 
   ## Examples
 
-  iex> Collidable.resolve_collision(
-  ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-  ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2, midpoint: %{x: 4, y: 4}}
-  ...> )
-  nil
+    iex> Collidable.resolve_collision(
+    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
+    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2, midpoint: %{x: 4, y: 4}}
+    ...> )
+    nil
 
-  iex> Collidable.resolve_collision(
-  ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-  ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 4,
-  ...>     midpoint: %{x: 4, y: 1}}
-  ...> )
-  {%Collision.Vector.Vector2{x: 0.7071067811865475, y: 0.7071067811865475}, 0.7071067811865475}
+    iex> Collidable.resolve_collision(
+    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
+    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 4,
+    ...>     midpoint: %{x: 4, y: 1}}
+    ...> )
+    {%Collision.Vector.Vector2{x: 0.7071067811865475, y: 0.7071067811865475}, 0.7071067811865475}
 
   """
   def resolve_collision(any, any)
