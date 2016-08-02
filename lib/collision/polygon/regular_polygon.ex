@@ -28,9 +28,9 @@ defmodule Collision.Polygon.RegularPolygon do
 
   ## Examples
 
-    iex> Collision.Polygon.RegularPolygon.from_tuple({3, 2, 0, {0, 0}})
-    {:ok, %Collision.Polygon.RegularPolygon{n_sides: 3, radius: 2,
-    rotation_angle: 0.0, midpoint: %Collision.Polygon.Vertex{x: 0, y: 0}}}
+      iex> Collision.Polygon.RegularPolygon.from_tuple({3, 2, 0, {0, 0}})
+      {:ok, %Collision.Polygon.RegularPolygon{n_sides: 3, radius: 2,
+      rotation_angle: 0.0, midpoint: %Collision.Polygon.Vertex{x: 0, y: 0}}}
 
   """
   @spec from_tuple({integer, number, number, {number, number}}, atom) :: RegularPolygon.t
@@ -56,11 +56,11 @@ defmodule Collision.Polygon.RegularPolygon do
 
   ## Examples
 
-    iex> Collision.Polygon.RegularPolygon.calculate_vertices(
-    ...>   %Collision.Polygon.RegularPolygon{
-    ...>     n_sides: 4, radius: 2, rotation_angle: 0, midpoint: %{x: 2, y: 0}
-    ...>   })
-    [{4.0, 0.0}, {2.0, 2.0}, {0.0, 0.0}, {2.0, -2.0}]
+      iex> Collision.Polygon.RegularPolygon.calculate_vertices(
+      ...>   %Collision.Polygon.RegularPolygon{
+      ...>     n_sides: 4, radius: 2, rotation_angle: 0, midpoint: %{x: 2, y: 0}
+      ...>   })
+      [{4.0, 0.0}, {2.0, 2.0}, {0.0, 0.0}, {2.0, -2.0}]
 
   """
   @spec calculate_vertices(t) :: [Vertex.t]
@@ -108,12 +108,12 @@ defmodule Collision.Polygon.RegularPolygon do
 
   ## Examples
 
-    iex(1)> p = Collision.two_dimensional_polygon(4, 3, 0, {0,0})
-    %Collision.Polygon.RegularPolygon{midpoint: %Collision.Polygon.Vertex{x: 0, y: 0},
-    n_sides: 4, radius: 3, rotation_angle: 0.0}
-    iex(2)> Collision.Polygon.RegularPolygon.translate_polygon(p, %{x: -2, y: 2})
-    %Collision.Polygon.RegularPolygon{midpoint: %Collision.Polygon.Vertex{x: -2, y: 2},
-    n_sides: 4, radius: 3, rotation_angle: 0.0}
+      iex(1)> p = Collision.two_dimensional_polygon(4, 3, 0, {0,0})
+      %Collision.Polygon.RegularPolygon{midpoint: %Collision.Polygon.Vertex{x: 0, y: 0},
+      n_sides: 4, radius: 3, rotation_angle: 0.0}
+      iex(2)> Collision.Polygon.RegularPolygon.translate_polygon(p, %{x: -2, y: 2})
+      %Collision.Polygon.RegularPolygon{midpoint: %Collision.Polygon.Vertex{x: -2, y: 2},
+      n_sides: 4, radius: 3, rotation_angle: 0.0}
 
   """
   def translate_vertices(polygon_vertices, %{x: _x, y: _y} = translation) do
@@ -129,15 +129,15 @@ defmodule Collision.Polygon.RegularPolygon do
 
   ## Examples
 
-    iex(1)> p = Collision.two_dimensional_polygon(4, 3, 0, {0,0})
-    %Collision.Polygon.RegularPolygon{midpoint: %Collision.Polygon.Vertex{x: 0,
-    y: 0}, n_sides: 4, radius: 3, rotation_angle: 0.0}
-    iex(2)> vertices = Collision.Polygon.RegularPolygon.calculate_vertices(p)
-    [{3.0, 0.0}, {0.0, 3.0}, {-3.0, 0.0}, {0.0, -3.0}]
-    iex(3)> Collision.Polygon.RegularPolygon.rotate_polygon_degrees(vertices, 180)
-    [{-3.0, 0.0}, {0.0, -3.0}, {3.0, 0.0}, {0.0, 3.0}]
-    iex(4)> Collision.Polygon.RegularPolygon.rotate_polygon_degrees(vertices, 360)
-    [{3.0, 0.0}, {0.0, 3.0}, {-3.0, 0.0}, {0.0, -3.0}]
+      iex(1)> p = Collision.two_dimensional_polygon(4, 3, 0, {0,0})
+      %Collision.Polygon.RegularPolygon{midpoint: %Collision.Polygon.Vertex{x: 0,
+      y: 0}, n_sides: 4, radius: 3, rotation_angle: 0.0}
+      iex(2)> vertices = Collision.Polygon.RegularPolygon.calculate_vertices(p)
+      [{3.0, 0.0}, {0.0, 3.0}, {-3.0, 0.0}, {0.0, -3.0}]
+      iex(3)> Collision.Polygon.RegularPolygon.rotate_polygon_degrees(vertices, 180)
+      [{-3.0, 0.0}, {0.0, -3.0}, {3.0, 0.0}, {0.0, 3.0}]
+      iex(4)> Collision.Polygon.RegularPolygon.rotate_polygon_degrees(vertices, 360)
+      [{3.0, 0.0}, {0.0, 3.0}, {-3.0, 0.0}, {0.0, -3.0}]
 
   """
   @spec rotate_polygon_degrees([Vertex.t] | RegularPolygon.t, degrees) :: [Vertex.t]
@@ -151,12 +151,12 @@ defmodule Collision.Polygon.RegularPolygon do
 
   ## Examples
 
-    iex(1)> p = Collision.two_dimensional_polygon(4, 3, 0, {0,0})
-    %Collision.Polygon.RegularPolygon{midpoint: %Collision.Polygon.Vertex{x: 0,
-    y: 0}, n_sides: 4, radius: 3, rotation_angle: 0.0}
-    iex(2)> v = Collision.Polygon.RegularPolygon.calculate_vertices(p)
-    iex(3)> Collision.Polygon.RegularPolygon.rotate_polygon(v, 3.14)
-    [{-3.0, 0.0}, {0.0, -3.0}, {3.0, 0.0}, {0.0, 3.0}]
+      iex(1)> p = Collision.two_dimensional_polygon(4, 3, 0, {0,0})
+      %Collision.Polygon.RegularPolygon{midpoint: %Collision.Polygon.Vertex{x: 0,
+      y: 0}, n_sides: 4, radius: 3, rotation_angle: 0.0}
+      iex(2)> v = Collision.Polygon.RegularPolygon.calculate_vertices(p)
+      iex(3)> Collision.Polygon.RegularPolygon.rotate_polygon(v, 3.14)
+      [{-3.0, 0.0}, {0.0, -3.0}, {3.0, 0.0}, {0.0, 3.0}]
 
   """
   @spec rotate_polygon([Vertex.t], radians, %{x: number, y: number}) :: [Vertex.t]
@@ -176,8 +176,8 @@ defmodule Collision.Polygon.RegularPolygon do
 
   ## Examples
 
-    iex> Collision.Polygon.RegularPolygon.round_vertices([{1.55555555, 1.2222222}])
-    [{1.55556, 1.22222}]
+      iex> Collision.Polygon.RegularPolygon.round_vertices([{1.55555555, 1.2222222}])
+      [{1.55556, 1.22222}]
 
   """
   @spec round_vertices([{number, number}]) :: [{number, number}]

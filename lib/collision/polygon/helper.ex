@@ -12,8 +12,8 @@ defmodule Collision.Polygon.Helper do
 
   ## Examples
 
-    iex> Collision.Polygon.Helper.degrees_to_radians(180)
-    :math.pi
+      iex> Collision.Polygon.Helper.degrees_to_radians(180)
+      :math.pi
 
   """
   @spec degrees_to_radians(degrees) :: radians

@@ -19,8 +19,8 @@ defprotocol Vector do
 
   ## Examples
 
-    iex> Vector.to_tuple(%Collision.Vector2{x: 1.0, y: 1.5})
-    {1.0, 1.5}
+      iex> Vector.to_tuple(%Collision.Vector2{x: 1.0, y: 1.5})
+      {1.0, 1.5}
 
   """
   def to_tuple(vector)
@@ -30,8 +30,8 @@ defprotocol Vector do
 
   ## Examples
 
-    iex> Vector.round_components(%Vector2{x: 1.32342, y: 4.23231}, 2)
-    %Vector2{x: 1.32, y: 4.23}
+      iex> Vector.round_components(%Vector2{x: 1.32342, y: 4.23231}, 2)
+      %Vector2{x: 1.32, y: 4.23}
 
   """
   def round_components(vector, integer)
@@ -41,8 +41,9 @@ defprotocol Vector do
 
   ## Examples
 
-    iex> Vector.scalar_mult(%Collision.Vector2{x: 5.0, y: 2.0}, -1)
-    %Collision.Vector2{x: -5.0, y: -2.0}
+      iex> Vector.scalar_mult(%Collision.Vector2{x: 5.0, y: 2.0}, -1)
+      %Collision.Vector2{x: -5.0, y: -2.0}
+
   """
   def scalar_mult(vector, scalar)
 
@@ -51,8 +52,8 @@ defprotocol Vector do
 
   ## Examples
 
-    iex> Vector.add(%Collision.Vector2{x: 1.0, y: 1.0}, %Collision.Vector2{x: 2.0, y: 2.0})
-    %Collision.Vector2{x: 3.0, y: 3.0}
+      iex> Vector.add(%Collision.Vector2{x: 1.0, y: 1.0}, %Collision.Vector2{x: 2.0, y: 2.0})
+      %Collision.Vector2{x: 3.0, y: 3.0}
 
   """
   def add(vector, vector)
@@ -62,8 +63,8 @@ defprotocol Vector do
 
   ## Examples
 
-    iex> Vector.subtract(%Collision.Vector2{x: 4.0, y: 1.0}, %Collision.Vector2{x: 1.0, y: 4.0})
-    %Collision.Vector2{x: 3.0, y: -3.0}
+      iex> Vector.subtract(%Collision.Vector2{x: 4.0, y: 1.0}, %Collision.Vector2{x: 1.0, y: 4.0})
+      %Collision.Vector2{x: 3.0, y: -3.0}
 
   """
   def subtract(vector, vector)
@@ -73,8 +74,8 @@ defprotocol Vector do
 
   ## Examples
 
-    iex> Vector.magnitude(%Collision.Vector2{x: 3.0, y: 4.0})
-    5.0
+      iex> Vector.magnitude(%Collision.Vector2{x: 3.0, y: 4.0})
+      5.0
 
   """
   def magnitude(vector)
@@ -84,8 +85,8 @@ defprotocol Vector do
 
   ## Examples
 
-    iex> Vector.magnitude(%Collision.Vector2{x: 3.0, y: 4.0})
-    25.0
+      iex> Vector.magnitude(%Collision.Vector2{x: 3.0, y: 4.0})
+      25.0
 
   """
   def magnitude_squared(vector)
@@ -95,8 +96,8 @@ defprotocol Vector do
 
   ## Examples
 
-    iex> Vector.normalize(%Collision.Vector2{x: 3.0, y: 4.0})
-    %Collision.Vector2{x: 0.6, y: 0.8}
+      iex> Vector.normalize(%Collision.Vector2{x: 3.0, y: 4.0})
+      %Collision.Vector2{x: 0.6, y: 0.8}
 
   """
   def normalize(vector)
@@ -109,8 +110,8 @@ defprotocol Vector do
 
   ## Examples
 
-    iex> Vector.dot_product(%Collision.Vector2{x: 3.0, y: 4.0}, %Collision.Vector2{x: -1.0, y: 2.0})
-    5.0
+      iex> Vector.dot_product(%Collision.Vector2{x: 3.0, y: 4.0}, %Collision.Vector2{x: -1.0, y: 2.0})
+      5.0
 
   """
   def dot_product(vector, vector)
@@ -120,8 +121,8 @@ defprotocol Vector do
 
   ## Examples
 
-    iex> Vector.projection(%Collision.Vector2{x: 3.0, y: 4.0}, %Collision.Vector2{x: -1.0, y: 2.0})
-    %Collision.Vector2{x: -2.23606797749979, y: 4.47213595499958}
+      iex> Vector.projection(%Collision.Vector2{x: 3.0, y: 4.0}, %Collision.Vector2{x: -1.0, y: 2.0})
+      %Collision.Vector2{x: -2.23606797749979, y: 4.47213595499958}
 
   """
   def projection(vector, vector)
