@@ -70,5 +70,4 @@ defmodule Collision.Polygon.RegularPolygonTest do
       polygon_translated == vertices_translated
     end
   end
-
 end
