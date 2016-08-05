@@ -45,4 +45,11 @@ defmodule Collision.Polygon.Edge do
     dot = Vector.dot_product(vector_1_2, vector_2_3)
     :math.acos(dot/(length_1_2 + length_2_3))
   end
+
+  defimpl String.Chars, for: Edge do
+    @spec to_string(Edge.t) :: String.t
+    def to_string(%Edge{} = e) do
+      "#{e.point} -> #{e.next}"
+    end
+  end
 end
