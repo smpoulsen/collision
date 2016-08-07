@@ -43,7 +43,13 @@ defmodule Collision.Polygon.Edge do
     vector_1_2 = Vector2.from_points(edge1.point, edge2.point)
     vector_2_3 = Vector2.from_points(edge2.point, edge3.point)
     dot = Vector.dot_product(vector_1_2, vector_2_3)
-    :math.acos(dot/(length_1_2 + length_2_3))
+    angle = dot / (length_1_2 + length_2_3)
+    case abs(angle) do
+      x when x > 1 ->
+        {:error, "reflex angle"}
+      _ ->
+        :math.acos(angle)
+    end
   end
 
   defimpl String.Chars, for: Edge do
