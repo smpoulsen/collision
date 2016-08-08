@@ -1,17 +1,16 @@
-defmodule GeneralPolygonTest do
+defmodule PolygonTest do
   use ExUnit.Case
   use ExCheck
-  doctest Collision.Polygon
-
   alias Collision.Polygon
   alias Collision.Polygon.Vertex
+  doctest Collision.Polygon
 
   # Generator for vertex
   def vertex do
     domain(:vertex,
       fn(self, size) ->
-        {_, x1} = :triq_dom.pick(non_neg_integer, size)
-        {_, y1} = :triq_dom.pick(non_neg_integer, size)
+        {_, x1} = :triq_dom.pick(int, size)
+        {_, y1} = :triq_dom.pick(int, size)
         vertex = %Vertex{x: x1, y: y1}
         {self, vertex}
       end, fn
@@ -25,11 +24,13 @@ defmodule GeneralPolygonTest do
   # Generator for Polygon values
   def polygon do
     domain(:polygon,
-      fn(self, size) ->
-        {_, n_vertices} = :triq_dom.pick(:triq_dom.elements([3,4,5,6,7,8,9,10]), size)
-        vertices = 0..n_vertices
-        |> Stream.map(fn _x -> :triq_dom.pick(vertex, size) end)
+      fn(self, _size) ->
+        {_, n_vertices} = :triq_dom.pick(:triq_dom.elements([6,7,8,9,10,11,12]), 10)
+        vertices = 3..n_vertices
+        |> Stream.map(fn _x -> :triq_dom.pick(vertex, 50) end)
         |> Enum.map(fn {_, v} -> v end)
+        |> Vertex.graham_scan
+
         polygon = Polygon.from_vertices(vertices)
         {self, polygon}
       end, fn
@@ -46,14 +47,14 @@ defmodule GeneralPolygonTest do
   property :rotating_polygon_2pi_x_constant_is_no_rotation do
     for_all p in polygon do
       rotations = [-720, -360, 0, 360, 720]
-      vertices = p
       Enum.all?(rotations, fn r ->
-        Polygon.rotate_polygon_degrees(vertices, r) == vertices
+        rotated = Polygon.rotate_polygon_degrees(p, r)
+        Vertex.round_vertices(p.vertices) == Vertex.round_vertices(rotated.vertices)
       end)
     end
   end
 
-  property :n_vertices_equals_n_sides do
+  property :n_vertices_equals_n_edges do
     for_all p in polygon do
       length(p.vertices) == p.edges |> length
     end
@@ -72,17 +73,17 @@ defmodule GeneralPolygonTest do
     end
   end
 
-  property :translation_is_same_for_polygon_and_vertices do
+  property :translation_moves_a_polygon do
     for_all {p, x, y} in {polygon, int, int} do
       polygon_translated = p
       |> Polygon.translate_polygon(%{x: x, y: y})
-      |> Polygon.calculate_vertices
-      |> Polygon.round_vertices
-      vertices_translated = p
-      |> Polygon.calculate_vertices
-      |> Polygon.translate_vertices(%{x: x, y: y})
-      |> Polygon.round_vertices
-      polygon_translated == vertices_translated
+
+      zipped_vertices = Enum.zip(p.vertices, polygon_translated.vertices)
+      Enum.all?(
+        for {p, t} <- zipped_vertices do
+          t.x == (p.x + x) && t.y == (p.y + y)
+        end
+      )
     end
   end
 end

@@ -3,6 +3,7 @@ defmodule Collision.Polygon.RegularPolygonTest do
   use ExCheck
   doctest Collision.Polygon.RegularPolygon
   alias Collision.Polygon.RegularPolygon
+  alias Collision.Polygon.Vertex
 
   # Generator for RegularPolygon values
   def polygon do
@@ -17,7 +18,7 @@ defmodule Collision.Polygon.RegularPolygonTest do
         {self, polygon}
       end, fn
         (self, polygon) ->
-          s = max(polygon.n_sides - 2, 3)
+          s = max(polygon.sides - 2, 3)
           r = max(polygon.radius - 2, 1)
           a = max(polygon.rotation_angle - 2, 0)
           x = max(polygon.midpoint.x - 2, 0)
@@ -30,17 +31,18 @@ defmodule Collision.Polygon.RegularPolygonTest do
   property :rotating_polygon_2pi_x_constant_is_no_rotation do
     for_all p in polygon do
       rotations = [-720, -360, 0, 360, 720]
-      vertices = RegularPolygon.calculate_vertices(p)
       Enum.all?(rotations, fn r ->
-        RegularPolygon.rotate_polygon_degrees(vertices, r) == vertices
+        rotated = RegularPolygon.rotate_polygon_degrees(p, r)
+        Vertex.round_vertices(p.polygon.vertices) ==
+          Vertex.round_vertices(rotated.polygon.vertices)
       end)
     end
   end
 
-  property :n_vertices_equals_n_sides do
+  property :n_vertices_equals_sides do
     for_all p in polygon do
-      vertices = RegularPolygon.calculate_vertices(p)
-      length(vertices) == p.n_sides
+      length(p.polygon.vertices) == p.sides &&
+        p.sides == length(p.polygon.edges)
     end
   end
 
@@ -57,17 +59,17 @@ defmodule Collision.Polygon.RegularPolygonTest do
     end
   end
 
-  property :translation_is_same_for_polygon_and_vertices do
+  property :translation_moves_a_polygon do
     for_all {p, x, y} in {polygon, int, int} do
       polygon_translated = p
       |> RegularPolygon.translate_polygon(%{x: x, y: y})
-      |> RegularPolygon.calculate_vertices
-      |> RegularPolygon.round_vertices
-      vertices_translated = p
-      |> RegularPolygon.calculate_vertices
-      |> RegularPolygon.translate_vertices(%{x: x, y: y})
-      |> RegularPolygon.round_vertices
-      polygon_translated == vertices_translated
+
+      zipped_vertices = Enum.zip(p.polygon.vertices, polygon_translated.polygon.vertices)
+      Enum.all?(
+        for {p, t} <- zipped_vertices do
+          round(t.x) == round(p.x + x) && round(t.y) == round(p.y + y)
+        end
+      )
     end
   end
 end
