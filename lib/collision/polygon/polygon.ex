@@ -12,6 +12,8 @@ defmodule Collision.Polygon do
   alias Collision.Polygon.Edge
   alias Collision.Polygon.Vertex
   alias Collision.Polygon.Helper
+  alias Collision.Vector.Vector2
+  alias Collision.Detection.SeparatingAxis
 
   @type t :: %Polygon{edges: [Edge.t]}
   @type axis :: {Vertex.t, Vertex.t}
@@ -30,6 +32,33 @@ defmodule Collision.Polygon do
   end
 
   @doc """
+  In a convex polygon, all internal angles are < 180 degrees.
+
+  Returns: true | false
+
+  ## Example
+
+    iex> p = Polygon.from_vertices([%Vertex{x: 2, y: 2}, %Vertex{x: -2, y: 2},
+    ...>     %Vertex{x: -2, y: -2}, %Vertex{x: 2, y: -2}])
+    iex> Polygon.convex?(p)
+    true
+
+    iex> p = Polygon.from_vertices([%Vertex{x: 2, y: 2}, %Vertex{x: 0, y: 0},
+    ...>     %Vertex{x: -2, y: 2}, %Vertex{x: -2, y: -2}, %Vertex{x: 2, y: -2}])
+    iex> Polygon.convex?(p)
+    false
+  """
+  @spec convex?(Polygon.t) :: boolean
+  def convex?(%Polygon{edges: edges}) do
+    edges
+    |> Stream.cycle
+    |> Stream.chunk(3, 1)
+    |> Stream.take(length(edges))
+    |> Stream.map(&Edge.calculate_angle/1)
+    |> Enum.all?(&(&1 < :math.pi))
+  end
+
+  @doc """
   Translate a polygon's vertices.
 
   ## Examples
@@ -45,20 +74,32 @@ defmodule Collision.Polygon do
     fn %{x: x, y: y} -> %Vertex{x: x + x_translate, y: y + y_translate} end
   end
 
+  @spec centroid(Polygon.t) :: Vertex.t
+  def centroid(%Polygon{} = polygon) do
+    polygon.vertices
+    |> Enum.reduce({0, 0}, fn vertex, {x, y} ->
+      {x + vertex.x, y + vertex.y}
+    end)
+    |> (fn {x, y} ->
+      {x / length(polygon.vertices), y / length(polygon.vertices)}
+    end).()
+    |> Vertex.from_tuple
+  end
+
   @doc """
   Rotate a regular polygon using rotation angle in degrees.
 
   ## Examples
 
   """
-  @spec rotate_polygon_degrees(Polygon.t, degrees) :: Polygon.t
-  def rotate_polygon_degrees(polygon, degrees) do
+  @spec rotate_polygon_degrees(Polygon.t, degrees, %{x: number, y: number}) :: Polygon.t
+  def rotate_polygon_degrees(polygon, degrees, point \\ %{x: 0, y: 0}) do
     angle_in_radians = Helper.degrees_to_radians(degrees)
-    rotate_polygon(polygon, angle_in_radians)
+    rotate_polygon(polygon, angle_in_radians, point)
   end
 
   @doc """
-  Rotate a regular polygon, rotation angle should be radians.
+  Rotate a polygon, rotation angle should be radians.
 
   The rotation point is the point around which the polygon is rotated.
   It defaults to the origin, so without specifying the polygon's
@@ -74,7 +115,9 @@ defmodule Collision.Polygon do
     |> Enum.map(fn vertex -> rotate.(vertex) end)
     |> from_vertices
   end
-  defp rotate_vertex(radians, rotation_point) do
+
+  @spec rotate_vertex(number, Vertex.t) :: Vertex.t
+  def rotate_vertex(radians, rotation_point) do
     fn %{x: x, y: y} ->
       x_offset = x - rotation_point.x
       y_offset = y - rotation_point.y
@@ -84,17 +127,62 @@ defmodule Collision.Polygon do
     end
   end
 
-  @doc """
-  Rounds the x and y components of an {x, y} tuple.
+  @spec lowest_left_vertex(Polygon.t) :: Vertex.t
+  def lowest_left_vertex(polygon) do
+    polygon.vertices
+    |> Enum.sort_by(fn vertex -> [vertex.x, vertex.y] end)
+    |> Enum.at(0)
+  end
 
-  ## Examples
+  defimpl String.Chars, for: Polygon do
+    @spec to_string(Polygon.t) :: String.t
+    def to_string(%Polygon{} = p) do
+      edges = Enum.map(p.edges, &String.Chars.to_string/1)
+      "#{Enum.join(edges, ",")}"
+    end
+  end
 
-  """
-  @spec round_vertices([{number, number}]) :: [{number, number}]
-  def round_vertices(vertices) do
-    vertices
-    |> Enum.map(fn {x, y} ->
-      {Float.round(x, 5), Float.round(y, 5)}
-    end)
+  defimpl Collidable, for: Polygon do
+    @spec collision?(Polygon.t, Polygon.t) :: boolean
+    def collision?(%Polygon{} = p1, %Polygon{} = p2) do
+      SeparatingAxis.collision?(p1, p2)
+    end
+
+    @spec resolution(Polygon.t, Polygon.t) :: {Vector2.t, number}
+    def resolution(%Polygon{} = p1, %Polygon{} = p2) do
+      SeparatingAxis.collision_mtv(p1, p2)
+    end
+
+    @spec resolve_collision(Polygon.t, Polygon.t) :: {Polygon.t, Polygon.t}
+    def resolve_collision(%Polygon{} = p1, %Polygon{} = p2) do
+      {mtv, magnitude} = resolution(p1, p2)
+      p1_midpoint = Polygon.centroid(p1)
+      p2_midpoint = Polygon.centroid(p2)
+      vector_from_p1_to_p2 = %Vector2{
+        x: p2_midpoint.x - p1_midpoint.x,
+        y: p2_midpoint.y - p1_midpoint.y}
+      translation_vector =
+        case Vector.dot_product(mtv, vector_from_p1_to_p2) do
+          x when x < 0 ->
+            Vector.scalar_mult(mtv, -1 * magnitude)
+          _ ->
+            Vector.scalar_mult(mtv, magnitude)
+        end
+      translated = Polygon.translate_polygon(p2, translation_vector)
+      translated_mtv = Collidable.resolution(p1, translated)
+      # TODO This is a workaround. There's something wrong with the calculation
+      # for vector_from_p1_to_p2 that's causing the translation vector to be
+      # flipped in cases of (near total) containment.
+      case translated_mtv do
+        nil -> {p1, Polygon.translate_polygon(p2, translation_vector)}
+        {_mtv, magnitude} ->
+          if round(magnitude) == 0 do
+            {p1, Polygon.translate_polygon(p2, translation_vector)}
+          else
+            opposite_translation = Vector.scalar_mult(translation_vector, -1)
+            {p1, Polygon.translate_polygon(p2, opposite_translation)}
+          end
+      end
+    end
   end
 end

@@ -4,11 +4,13 @@ defmodule Collision.Polygon.RegularPolygon do
   angles and all sides be equal. With enough sides,
   a regular polygon tends toward a circle.
   """
-  defstruct n_sides: 3, radius: 0, rotation_angle: 0.0, midpoint: %{x: 0, y: 0}
+  defstruct sides: 3, radius: 0, rotation_angle: 0.0, midpoint: %{x: 0, y: 0}, polygon: nil
 
   alias Collision.Polygon.RegularPolygon
+  alias Collision.Polygon
   alias Collision.Polygon.Helper
   alias Collision.Polygon.Vertex
+  alias Collision.Polygon.Edge
   alias Collision.Detection.SeparatingAxis
   alias Collision.Vector.Vector2
 
@@ -42,11 +44,15 @@ defmodule Collision.Polygon.RegularPolygon do
     from_tuple({s, r, angle_in_radians, {x, y}}, :radians)
   end
   def from_tuple({s, r, a, {x, y}}, :radians) do
-    {:ok, %RegularPolygon{
-        n_sides: s,
-        radius: r,
-        rotation_angle: a,
-        midpoint: %Vertex{x: x, y: y}
+    vertices = calculate_vertices(s, r, a, %{x: x, y: y})
+    polygon = Polygon.from_vertices(vertices)
+    {:ok,
+     %RegularPolygon{
+       sides: s,
+       radius: r,
+       rotation_angle: a,
+       midpoint: %Vertex{x: x, y: y},
+       polygon: polygon
      }}
   end
   def from_tuple({s, r, a, {x, y}}), do: from_tuple({s, r, a, {x, y}}, :degrees)
@@ -63,30 +69,29 @@ defmodule Collision.Polygon.RegularPolygon do
       [{4.0, 0.0}, {2.0, 2.0}, {0.0, 0.0}, {2.0, -2.0}]
 
   """
-  @spec calculate_vertices(t) :: [Vertex.t]
-  def calculate_vertices(%RegularPolygon{n_sides: s}) when s < 3 do
-    {:invalid_number_of_sides}
+  @spec calculate_vertices(t | number, number, %{x: number, y: number}) :: [Vertex.t]
+  def calculate_vertices(%RegularPolygon{} = p) do
+    calculate_vertices(p.sides, p.radius, p.rotation_angle, p.midpoint)
   end
-  def calculate_vertices(%RegularPolygon{n_sides: s, rotation_angle: a} = polygon) do
-    rotation_angle = 2 * :math.pi / s
-    0..s - 1
-    |> Enum.map(fn (n) ->
-      calculate_vertex(polygon, rotation_angle, n)
+  def calculate_vertices(sides, _r, _a, _m) when sides < 3, do: {:invalid_number_of_sides}
+  def calculate_vertices(sides, radius, initial_rotation_angle, midpoint \\ %{x: 0, y: 0}) do
+    rotation_angle = 2 * :math.pi / sides
+    f_rotate_vertex = Polygon.rotate_vertex(initial_rotation_angle, midpoint)
+    0..sides - 1
+    |> Stream.map(fn (n) ->
+      calculate_vertex(radius, midpoint, rotation_angle, n)
     end)
-    |> rotate_polygon(a, polygon.midpoint)
+    |> Stream.map(fn vertex -> f_rotate_vertex.(vertex) end)
+    |> Enum.map(&Vertex.round_vertex/1)
   end
 
   # Find the vertex of a side of a regular polygon given the polygon struct
   # and an integer representing a side.
-  @spec calculate_vertex(RegularPolygon.t, number, integer) :: Vertex.t
-  defp calculate_vertex(
-        %RegularPolygon{
-          radius: r,
-          midpoint: %{x: x, y: y}
-        }, angle, i) do
-    x1 = x + r * :math.cos(i * angle)
-    y1 = y + r * :math.sin(i * angle)
-    {x1, y1}
+  @spec calculate_vertex(number, %{x: number, y: number}, number, integer) :: Vertex.t
+  defp calculate_vertex(radius, %{x: x, y: y} = midpoint , angle, i) do
+    x1 = x + radius * :math.cos(i * angle)
+    y1 = y + radius * :math.sin(i * angle)
+    %Vertex{x: x1, y: y1}
   end
 
   @doc """
@@ -96,12 +101,14 @@ defmodule Collision.Polygon.RegularPolygon do
   @spec translate_polygon([Vertex.t] | RegularPolygon.t, Vertex.t) :: [Vertex.t] | RegularPolygon.t
   def translate_polygon(%RegularPolygon{} = p, %{x: _x, y: _y} = c) do
     new_midpoint = translate_midpoint(c).(p.midpoint)
-    %{p | midpoint: new_midpoint}
+    new_vertices = calculate_vertices(
+      p.sides, p.radius, p.rotation_angle, new_midpoint
+    )
+    %{p | midpoint: new_midpoint, polygon: Polygon.from_vertices(new_vertices)}
   end
   defp translate_midpoint(%{x: x_translate, y: y_translate}) do
     fn %{x: x, y: y} -> %Vertex{x: x + x_translate, y: y + y_translate} end
   end
-
 
   @doc """
   Translate a polygon's vertices.
@@ -190,22 +197,20 @@ defmodule Collision.Polygon.RegularPolygon do
 
   defimpl String.Chars, for: RegularPolygon do
     def to_string(%RegularPolygon{} = p) do
-      "%RegularPolygon{n_sides: #{p.n_sides}, radius: #{p.radius}, rotation_angle: #{p.rotation_angle}, midpoint: %{x: #{p.midpoint.x}, y: #{p.midpoint.y}}
-      }"
+      "%RegularPolygon{sides: #{p.sides}, radius: #{p.radius}, " <>
+      "midpoint #{p.midpoint}, edges: #{p.polygon.edges}, " <>
+      "vertices: #{p.polygon.vertices}"
     end
   end
 
   defimpl Collidable, for: RegularPolygon do
-    def collision?(polygon1, polygon2) do
-      p1_vertices = RegularPolygon.calculate_vertices(polygon1)
-      p2_vertices = RegularPolygon.calculate_vertices(polygon2)
-      SeparatingAxis.collision?(p1_vertices, p2_vertices)
+    @spec collision?(RegularPolygon.t, RegularPolygon.t) :: boolean
+    def collision?(p1, p2) do
+      SeparatingAxis.collision?(p1.polygon.vertices, p2.polygon.vertices)
     end
 
     def resolution(%RegularPolygon{} = p1, %RegularPolygon{} = p2) do
-      p1_vertices = RegularPolygon.calculate_vertices(p1)
-      p2_vertices = RegularPolygon.calculate_vertices(p2)
-      SeparatingAxis.collision_mtv(p1_vertices, p2_vertices)
+      SeparatingAxis.collision_mtv(p1.polygon, p2.polygon)
     end
 
     @spec resolve_collision(RegularPolygon.t, RegularPolygon.t) :: {RegularPolygon.t, RegularPolygon.t}

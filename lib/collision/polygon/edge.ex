@@ -10,14 +10,14 @@ defmodule Collision.Polygon.Edge do
 
   @type t :: t
 
-  @spec from_vertex_pair({Vertex.t, Vertex.t}) :: t
+  @spec from_vertex_pair({Vertex.t, Vertex.t}) :: t | {:error, String.t}
   def from_vertex_pair({point1, point1}), do: {:error, "Same point"}
   def from_vertex_pair({point1, point2} = points) do
     edge_length = calculate_length(points)
     %Edge{point: point1, next: point2, length: edge_length}
   end
 
-  @spec calculate_length({%{x: number, y: number}, %{x: number, y: number}}) :: number
+  @spec calculate_length({%{x: number, y: number}, %{x: number, y: number}}) :: float
   defp calculate_length({%{x: x1, y: y1}, %{x: x2, y: y2}}) do
     sum_of_squares = :math.pow(x2 - x1, 2) + :math.pow(y2 - y1, 2)
     :math.sqrt(sum_of_squares)
@@ -28,7 +28,7 @@ defmodule Collision.Polygon.Edge do
 
   Returns: angle B, in radians
   """
-  @spec calculate_angle(Edge.t, Edge.t, Edge.t) :: number
+  @spec calculate_angle(Edge.t, Edge.t, Edge.t) :: float | {:error, String.t}
   def calculate_angle([edge1, edge2, edge3]) do
     calculate_angle(edge1, edge2, edge3)
   end

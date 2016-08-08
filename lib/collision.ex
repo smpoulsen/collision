@@ -2,8 +2,11 @@ defmodule Collision do
   @moduledoc """
   Wrapper around functionality to generate polygons and test for collisions.
   """
+  alias Collision.Polygon.Polygon
   alias Collision.Polygon.RegularPolygon
   alias Collision.Detection.SeparatingAxis
+
+  @type polygon :: Polygon.t | RegularPolygon.t
 
   @doc """
   Create a two dimensional, regular polygon from a number of sides,
@@ -45,9 +48,9 @@ defmodule Collision do
       true
 
   """
-  @spec two_dimensional_collision?(RegularPolygon.t, RegularPolygon.t) :: boolean
+  @spec two_dimensional_collision?(polygon, polygon) :: boolean
   def two_dimensional_collision?(polygon1, polygon2) do
-    SeparatingAxis.collision?(polygon1, polygon2)
+    Collidable.collision?(polygon1, polygon2)
   end
 
   @doc """
@@ -72,8 +75,8 @@ defmodule Collision do
       {%Collision.Vector.Vector2{x: 2.0, y: 2.0}, 2.0}
 
   """
-  @spec two_dimensional_mtv(RegularPolygon.t, RegularPolygon.t) :: boolean
+  @spec two_dimensional_mtv(polygon, polygon) :: boolean
   def two_dimensional_mtv(polygon1, polygon2) do
-    SeparatingAxis.collision_mtv(polygon1, polygon2)
+    Collidable.resolution(polygon1, polygon2)
   end
 end
