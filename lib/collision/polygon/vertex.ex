@@ -12,11 +12,33 @@ defmodule Collision.Polygon.Vertex do
   """
   @type t :: Vertex.t
 
+  @doc """
+  Convert a tuple to a Vertex.
+
+  Returns: %Vertex{}
+
+  ## Example
+
+      iex> Vertex.from_tuple({2, 5})
+      %Vertex{x: 2, y: 5}
+
+  """
   @spec from_tuple({number, number}) :: Vertex.t
   def from_tuple({x, y}) do
     %Vertex{x: x, y: y}
   end
 
+  @doc """
+  Convert a vertex to a tuple.
+
+  Returns: {}
+
+  ## Example
+
+      iex> Vertex.to_tuple(%Vertex{x: 2, y: 5})
+      {2, 5}
+
+  """
   @spec to_tuple(Vertex.t) :: {number, number}
   def to_tuple(%Vertex{x: x, y: y}) do
     {x, y}
@@ -30,7 +52,7 @@ defmodule Collision.Polygon.Vertex do
      < 0, clockwise
   """
   @spec determinant(Vertex.t, Vertex.t, Vertex.t) :: number
-  def determinant(%Vertex{} = v1, %Vertex{} = v2, %Vertex{} = v3) do
+  defp determinant(%Vertex{} = v1, %Vertex{} = v2, %Vertex{} = v3) do
     (v2.x - v1.x)*(v3.y - v1.y) - (v2.y - v1.y)*(v3.x - v1.x)
   end
   defp counter_clockwise(v1, v2, v3) do
@@ -109,6 +131,9 @@ defmodule Collision.Polygon.Vertex do
 
   ## Examples
 
+      iex> Vertex.round_vertex(%Vertex{x: 1.9999999, y: 1.9999999})
+      %Vertex{x: 2.0, y: 2.0}
+
   """
   @spec round_vertex(Vertex.t) :: Vertex.t
   def round_vertex(%Vertex{x: x, y: y}) when (is_float(x) and is_float(y)) do
@@ -124,6 +149,12 @@ defmodule Collision.Polygon.Vertex do
   Returns: [Vertex.t]
 
   ## Examples
+
+      iex> Vertex.round_vertices([
+      ...>   %Vertex{x: 1.9999999, y: 1.99999999}, %Vertex{x: 2.11111111, y: 2.11111111}
+      ...> ])
+      [%Vertex{x: 2.0, y: 2.0}, %Vertex{x: 2.11111, y: 2.11111}]
+
   """
   @spec round_vertices([Vertex.t]) :: [Vertex.t]
   def round_vertices(vertices) do

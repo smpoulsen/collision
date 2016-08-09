@@ -2,6 +2,7 @@ defmodule Collision.PolygonTest do
   use ExUnit.Case
   use ExCheck
   alias Collision.Polygon
+  alias Collision.Polygon.Edge
   alias Collision.Polygon.Vertex
   doctest Collision.Polygon
 

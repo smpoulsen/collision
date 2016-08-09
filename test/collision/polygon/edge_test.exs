@@ -1,9 +1,9 @@
 defmodule EdgeTest do
   use ExUnit.Case
   use ExCheck
-  doctest Collision.Polygon.Edge
   alias Collision.Polygon.Edge
   alias Collision.Polygon.Vertex
+  doctest Collision.Polygon.Edge
 
   # Generator for edges
   def edge do
