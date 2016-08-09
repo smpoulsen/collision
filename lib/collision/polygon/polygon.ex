@@ -17,7 +17,6 @@ defmodule Collision.Polygon do
 
   @type t :: %Polygon{edges: [Edge.t]}
   @type axis :: {Vertex.t, Vertex.t}
-  @type polygon :: t | Collision.Polygon.RegularPolygon.t
   @typep degrees :: number
   @typep radians :: number
 
@@ -29,6 +28,56 @@ defmodule Collision.Polygon do
       Edge.from_vertex_pair({point1, point2})
     end)
     %Polygon{edges: edges, vertices: vertices}
+  end
+
+  @doc """
+  Construct a regular polygon.
+
+  A polygon must have at least three sides.
+
+  ## Examples
+
+  """
+  @spec gen_regular_polygon(integer, number, number, {number, number}, atom) :: Polygon.t
+  def gen_regular_polygon(s, _r, _a, {_x, _y}, _d) when s < 3 do
+    {:error, "Polygon must have at least three sides"}
+  end
+  def gen_regular_polygon(s, r, a, {x, y}, :degrees) do
+    angle_in_radians = Float.round(Helper.degrees_to_radians(a), 5)
+    gen_regular_polygon(s, r, angle_in_radians, {x, y}, :radians)
+  end
+  def gen_regular_polygon(s, r, a, {x, y}, :radians) do
+    vertices = calculate_vertices(s, r, a, %{x: x, y: y})
+    Polygon.from_vertices(vertices)
+  end
+  def gen_regular_polygon(s, r, a, {x, y}), do: gen_regular_polygon(s, r, a, {x, y}, :degrees)
+
+  @doc """
+  Determine the vertices, or points, of the polygon.
+
+  ## Examples
+
+
+  """
+  @spec calculate_vertices(t | number, number, %{x: number, y: number}) :: [Vertex.t]
+  defp calculate_vertices(sides, _r, _a, _m) when sides < 3, do: {:invalid_number_of_sides}
+  defp calculate_vertices(sides, radius, initial_rotation_angle, midpoint \\ %{x: 0, y: 0}) do
+    rotation_angle = 2 * :math.pi / sides
+    f_rotate_vertex = Polygon.rotate_vertex(initial_rotation_angle, midpoint)
+    0..sides - 1
+    |> Stream.map(fn (n) ->
+      calculate_vertex(radius, midpoint, rotation_angle, n)
+    end)
+    |> Stream.map(fn vertex -> f_rotate_vertex.(vertex) end)
+    |> Enum.map(&Vertex.round_vertex/1)
+  end
+  # Find the vertex of a side of a regular polygon from its number of sides and the
+  # angle between its vertices.
+  @spec calculate_vertex(number, %{x: number, y: number}, number, integer) :: Vertex.t
+  defp calculate_vertex(radius, %{x: x, y: y} = midpoint , angle, i) do
+    x1 = x + radius * :math.cos(i * angle)
+    y1 = y + radius * :math.sin(i * angle)
+    %Vertex{x: x1, y: y1}
   end
 
   @doc """
@@ -125,13 +174,6 @@ defmodule Collision.Polygon do
       y_term = rotation_point.y + (x_offset * :math.sin(radians) + y_offset * :math.cos(radians))
       %Vertex{x: x_term, y: y_term}
     end
-  end
-
-  @spec lowest_left_vertex(Polygon.t) :: Vertex.t
-  def lowest_left_vertex(polygon) do
-    polygon.vertices
-    |> Enum.sort_by(fn vertex -> [vertex.x, vertex.y] end)
-    |> Enum.at(0)
   end
 
   defimpl String.Chars, for: Polygon do
