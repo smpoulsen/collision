@@ -1,10 +1,8 @@
 defmodule Collision.Polygon do
   @moduledoc """
-  General, non-regular polygons.
-
-  A general polygon is defined by its vertices; from these
-  we can calculate the edges, centroid, rotation angles,
-  and whether the polygon is concave or convex.
+  A general polygon is defined by its vertices; from these we can calculate
+  the edges, centroid, rotation angles, and whether the polygon is concave
+  or convex.
   """
   defstruct edges: [], vertices: []
 
@@ -52,16 +50,10 @@ defmodule Collision.Polygon do
   end
   def gen_regular_polygon(s, r, a, {x, y}), do: gen_regular_polygon(s, r, a, {x, y}, :degrees)
 
-  @doc """
-  Determine the vertices, or points, of the polygon.
-
-  ## Examples
-
-
-  """
-  @spec calculate_vertices(t | number, number, %{x: number, y: number}) :: [Vertex.t]
+  # Calculate the vertices of a regular polygon.
+  @spec calculate_vertices(number, number, number, %{x: number, y: number}) :: [Vertex.t]
   defp calculate_vertices(sides, _r, _a, _m) when sides < 3, do: {:invalid_number_of_sides}
-  defp calculate_vertices(sides, radius, initial_rotation_angle, midpoint \\ %{x: 0, y: 0}) do
+  defp calculate_vertices(sides, radius, initial_rotation_angle, midpoint) do
     rotation_angle = 2 * :math.pi / sides
     f_rotate_vertex = Polygon.rotate_vertex(initial_rotation_angle, midpoint)
     0..sides - 1
@@ -74,7 +66,7 @@ defmodule Collision.Polygon do
   # Find the vertex of a side of a regular polygon from its number of sides and the
   # angle between its vertices.
   @spec calculate_vertex(number, %{x: number, y: number}, number, integer) :: Vertex.t
-  defp calculate_vertex(radius, %{x: x, y: y} = midpoint , angle, i) do
+  defp calculate_vertex(radius, %{x: x, y: y} = _midpoint , angle, i) do
     x1 = x + radius * :math.cos(i * angle)
     y1 = y + radius * :math.sin(i * angle)
     %Vertex{x: x1, y: y1}
