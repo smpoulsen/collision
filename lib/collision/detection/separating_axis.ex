@@ -2,9 +2,8 @@ defmodule Collision.Detection.SeparatingAxis do
   @moduledoc """
   Implements the separating axis theorem for collision detection.
 
-  Checks for collision by projecting all of the edges of a polygon
-  against test axes, which are the normals of all the edges of
-  both polygons that are being tested.
+  Checks for collision by projecting all of the edges of a pair of polygons
+  against test axes that are the normals of their edges.
 
   If there is any axis for which the projections aren't overlapping,
   then the polygons are not colliding with one another. If all of
@@ -13,19 +12,30 @@ defmodule Collision.Detection.SeparatingAxis do
 
   alias Collision.Polygon.Vertex
   alias Collision.Polygon.Polygon
-  alias Collision.Polygon.RegularPolygon
   alias Collision.Vector.Vector2
 
   @type axis :: {Vertex.t, Vertex.t}
-  @type polygon :: RegularPolygon.t | Polygon.t
+  @type polygon :: Polygon.t
 
   @doc """
   Check for collision between two polygons.
 
   Returns: `true` | `false`
 
+  ## Examples
+
+      iex> p1 = Polygon.gen_regular_polygon(4, 4, 0, {0, 0})
+      iex> p2 = Polygon.gen_regular_polygon(4, 6, 0, {2, 2})
+      iex> SeparatingAxis.collision?(p1, p2)
+      true
+
+      iex> p1 = Polygon.gen_regular_polygon(3, 1, 0, {-5, 8})
+      iex> p2 = Polygon.gen_regular_polygon(4, 6, 0, {2, 2})
+      iex> SeparatingAxis.collision?(p1, p2)
+      false
+
   """
-  @spec collision?([axis], [axis]) :: boolean
+  @spec collision?(polygon, polygon) :: boolean
   def collision?(polygon_1, polygon_2) do
     projections = collision_projections(polygon_1, polygon_2)
     Enum.all?(projections, fn zipped_projection ->
@@ -39,6 +49,21 @@ defmodule Collision.Detection.SeparatingAxis do
   return is the magnitude of overlap?.
 
   Returns: nil | {Vector2.t, float}
+
+  ## Examples
+
+      iex> p1 = Polygon.gen_regular_polygon(4, 4, 45, {0, 0})
+      iex> p2 = Polygon.gen_regular_polygon(4, 4, 45, {4, 0})
+      iex> {mtv, magnitude} = SeparatingAxis.collision_mtv(p1, p2)
+      iex> Vector.round_components(mtv, 2)
+      %Collision.Vector.Vector2{x: -1.0, y: 0.0}
+      iex> Float.round(magnitude, 2)
+      1.66
+
+      iex> p1 = Polygon.gen_regular_polygon(3, 1, 0, {-5, 8})
+      iex> p2 = Polygon.gen_regular_polygon(4, 6, 0, {2, 2})
+      iex> SeparatingAxis.collision_mtv(p1, p2)
+      nil
 
   """
   # TODO There is repetition between this and collision?, but it

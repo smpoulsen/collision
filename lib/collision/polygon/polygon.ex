@@ -18,6 +18,27 @@ defmodule Collision.Polygon do
   @typep degrees :: number
   @typep radians :: number
 
+  @doc """
+  Takes a list of ordered vertices and returns the polygon they describe.
+
+  Returns: %Polygon{}
+
+  ## Example
+
+      iex> Polygon.from_vertices([
+      ...>   %Vertex{x: 4, y: 4}, %Vertex{x: 0, y: 4},
+      ...>   %Vertex{x: 0, y: 0}, %Vertex{x: 4, y: 0}])
+      %Polygon{vertices: [
+        %Vertex{x: 4, y: 4}, %Vertex{x: 0, y: 4},
+        %Vertex{x: 0, y: 0}, %Vertex{x: 4, y: 0}
+      ], edges: [
+        %Edge{length: 4.0, next: %Vertex{x: 0, y: 4}, point: %Vertex{x: 4, y: 4}},
+        %Edge{length: 4.0, next: %Vertex{x: 0, y: 0}, point: %Vertex{x: 0, y: 4}},
+        %Edge{length: 4.0, next: %Vertex{x: 4, y: 0}, point: %Vertex{x: 0, y: 0}},
+        %Edge{length: 4.0, next: %Vertex{x: 4, y: 4}, point: %Vertex{x: 4, y: 0}}
+      ]}
+
+  """
   @spec from_vertices([Vertex.t]) :: t
   def from_vertices(vertices) do
     edges = vertices
@@ -34,6 +55,28 @@ defmodule Collision.Polygon do
   A polygon must have at least three sides.
 
   ## Examples
+
+      iex> Polygon.gen_regular_polygon(4, 4, 0, {0, 0})
+      %Polygon{vertices: [
+        %Vertex{x: 4.0, y: 0.0}, %Vertex{x: 0.0, y: 4.0},
+        %Vertex{x: -4.0, y: 0.0}, %Vertex{x: 0.0, y: -4.0}
+      ], edges: [
+        %Edge{length: 5.656854249492381, next: %Vertex{x: 0.0, y: 4.0}, point: %Vertex{x: 4.0, y: 0.0}},
+        %Edge{length: 5.656854249492381, next: %Vertex{x: -4.0, y: 0.0}, point: %Vertex{x: 0.0, y: 4.0}},
+        %Edge{length: 5.656854249492381, next: %Vertex{x: 0.0, y: -4.0}, point: %Vertex{x: -4.0, y: 0.0}},
+        %Edge{length: 5.656854249492381, next: %Vertex{x: 4.0, y: 0.0}, point: %Vertex{x: 0.0, y: -4.0}}
+      ]}
+
+      iex> Polygon.gen_regular_polygon(3, 2, 0, {0, 0})
+      %Polygon{edges: [
+        %Edge{length: 3.4641012113533867, next: %Vertex{x: -1.0, y: 1.73205}, point: %Vertex{x: 2.0, y: 0.0}},
+        %Edge{length: 3.4641, next: %Vertex{x: -1.0, y: -1.73205}, point: %Vertex{x: -1.0, y: 1.73205}},
+        %Edge{length: 3.4641012113533867, next: %Vertex{x: 2.0, y: 0.0}, point: %Vertex{x: -1.0, y: -1.73205}}
+      ], vertices: [
+        %Vertex{x: 2.0, y: 0.0},
+        %Vertex{x: -1.0, y: 1.73205},
+        %Vertex{x: -1.0, y: -1.73205}
+      ]}
 
   """
   @spec gen_regular_polygon(integer, number, number, {number, number}, atom) :: Polygon.t
@@ -79,8 +122,10 @@ defmodule Collision.Polygon do
 
   ## Example
 
-    iex> p = Polygon.from_vertices([%Vertex{x: 2, y: 2}, %Vertex{x: -2, y: 2},
-    ...>     %Vertex{x: -2, y: -2}, %Vertex{x: 2, y: -2}])
+    iex> p = Polygon.from_vertices([
+    ...>       %Vertex{x: 2, y: 2}, %Vertex{x: -2, y: 2},
+    ...>       %Vertex{x: -2, y: -2}, %Vertex{x: 2, y: -2}
+    ...>     ])
     iex> Polygon.convex?(p)
     true
 
@@ -89,11 +134,13 @@ defmodule Collision.Polygon do
     iex> Polygon.convex?(p)
     false
   """
-  @spec convex?(Polygon.t) :: boolean
-  def convex?(%Polygon{edges: edges}) do
+  @spec convex?(Polygon.t | [Edge.t]) :: boolean
+  def convex?(%Polygon{edges: edges}), do: convex?(edges)
+  def convex?(edges) do
+    require IEx; IEx.pry
     edges
     |> Stream.cycle
-    |> Stream.chunk(3, 1)
+    |> Stream.chunk(2, 1)
     |> Stream.take(length(edges))
     |> Stream.map(&Edge.calculate_angle/1)
     |> Enum.all?(&(&1 < :math.pi))
@@ -102,19 +149,46 @@ defmodule Collision.Polygon do
   @doc """
   Translate a polygon's vertices.
 
-  ## Examples
+  Returns: %Polygon{}
+
+  ## Example
+
+      iex> p = Polygon.gen_regular_polygon(4, 4, 0, {0, 0})
+      iex> Polygon.translate_polygon(p, %{x: 2, y: 2})
+      %Polygon{vertices: [
+        %Vertex{x: 6.0, y: 2.0}, %Vertex{x: 2.0, y: 6.0},
+        %Vertex{x: -2.0, y: 2.0}, %Vertex{x: 2.0, y: -2.0}
+      ], edges: [
+        %Edge{length: 5.656854249492381, next: %Vertex{x: 2.0, y: 6.0}, point: %Vertex{x: 6.0, y: 2.0}},
+        %Edge{length: 5.656854249492381, next: %Vertex{x: -2.0, y: 2.0}, point: %Vertex{x: 2.0, y: 6.0}},
+        %Edge{length: 5.656854249492381, next: %Vertex{x: 2.0, y: -2.0}, point: %Vertex{x: -2.0, y: 2.0}},
+        %Edge{length: 5.656854249492381, next: %Vertex{x: 6.0, y: 2.0}, point: %Vertex{x: 2.0, y: -2.0}}
+      ]}
 
   """
   @spec translate_polygon(Polygon.t, %{x: number, y: number}) :: Polygon.t
   def translate_polygon(polygon, %{x: _x, y: _y} = translation) do
     polygon.vertices
     |> Enum.map(translate_vertex(translation))
+    |> Enum.map(&Vertex.round_vertex/1)
     |> from_vertices
   end
   defp translate_vertex(%{x: x_translate, y: y_translate}) do
     fn %{x: x, y: y} -> %Vertex{x: x + x_translate, y: y + y_translate} end
   end
 
+  @doc """
+  Find the midpoint of a polygon.
+
+  Returns: %Vertex{}
+
+  ## Example
+
+      iex> p = Polygon.gen_regular_polygon(4, 4, 0, {0, 0})
+      iex> Polygon.centroid(p)
+      %Vertex{x: 0.0, y: 0.0}
+
+  """
   @spec centroid(Polygon.t) :: Vertex.t
   def centroid(%Polygon{} = polygon) do
     polygon.vertices
@@ -130,7 +204,24 @@ defmodule Collision.Polygon do
   @doc """
   Rotate a regular polygon using rotation angle in degrees.
 
-  ## Examples
+  Returns: %Polygon{}
+
+  ## Example
+
+      iex> p = Polygon.from_vertices([
+      ...>       %Vertex{x: 2, y: 2}, %Vertex{x: -2, y: 2},
+      ...>       %Vertex{x: -2, y: -2}, %Vertex{x: 2, y: -2}
+      ...>     ])
+      iex> Polygon.rotate_polygon_degrees(p, 90)
+      %Polygon{edges: [
+        %Edge{length: 4.0, next: %Vertex{x: -2.0, y: -2.0}, point: %Vertex{x: -2.0, y: 2.0}},
+        %Edge{length: 4.0, next: %Vertex{x: 2.0, y: -2.0}, point: %Vertex{x: -2.0, y: -2.0}},
+        %Edge{length: 4.0, next: %Vertex{x: 2.0, y: 2.0}, point: %Vertex{x: 2.0, y: -2.0}},
+        %Edge{length: 4.0, next: %Vertex{x: -2.0, y: 2.0}, point: %Vertex{x: 2.0, y: 2.0}}
+      ], vertices: [
+        %Vertex{x: -2.0, y: 2.0}, %Vertex{x: -2.0, y: -2.0},
+        %Vertex{x: 2.0, y: -2.0}, %Vertex{x: 2.0, y: 2.0}
+      ]}
 
   """
   @spec rotate_polygon_degrees(Polygon.t, degrees, %{x: number, y: number}) :: Polygon.t
@@ -146,7 +237,24 @@ defmodule Collision.Polygon do
   It defaults to the origin, so without specifying the polygon's
   centroid as the rotation point, it will not be an in-place rotation.
 
-  ## Examples
+  Returns: %Polygon{}
+
+  ## Example
+
+      iex> p = Polygon.from_vertices([
+      ...>       %Vertex{x: 2, y: 2}, %Vertex{x: -2, y: 2},
+      ...>       %Vertex{x: -2, y: -2}, %Vertex{x: 2, y: -2}
+      ...>     ])
+      iex> Polygon.rotate_polygon(p, :math.pi)
+      %Polygon{edges: [
+      %Edge{length: 4.0, next: %Vertex{x: 2.0, y: -2.0}, point: %Vertex{x: -2.0, y: -2.0}},
+      %Edge{length: 4.0, next: %Vertex{x: 2.0, y: 2.0}, point: %Vertex{x: 2.0, y: -2.0}},
+        %Edge{length: 4.0, next: %Vertex{x: -2.0, y: 2.0}, point: %Vertex{x: 2.0, y: 2.0}},
+        %Edge{length: 4.0, next: %Vertex{x: -2.0, y: -2.0}, point: %Vertex{x: -2.0, y: 2.0}}
+      ], vertices: [
+        %Vertex{x: -2.0, y: -2.0}, %Vertex{x: 2.0, y: -2.0},
+        %Vertex{x: 2.0, y: 2.0}, %Vertex{x: -2.0, y: 2.0}
+      ]}
 
   """
   @spec rotate_polygon(Polygon.t, radians, %{x: number, y: number}) :: Polygon.t
@@ -157,19 +265,31 @@ defmodule Collision.Polygon do
     |> from_vertices
   end
 
-  @spec rotate_vertex(number, Vertex.t) :: Vertex.t
+  @doc """
+  From an angle and a vertex, generates a function to rotate a vertex around
+  a point.
+
+  Returns: (%Vertex{} -> %Vertex{})
+
+  ## Example
+
+      iex> rotation = Polygon.rotate_vertex(:math.pi, %{x: 0, y: 0})
+      iex> rotation.(%Vertex{x: 5, y: 0})
+      %Vertex{x: -5.0, y: 0.0}
+
+  """
+  @spec rotate_vertex(radians, Vertex.t) :: (Vertex.t -> Vertex.t)
   def rotate_vertex(radians, rotation_point) do
     fn %{x: x, y: y} ->
       x_offset = x - rotation_point.x
       y_offset = y - rotation_point.y
       x_term = rotation_point.x + (x_offset * :math.cos(radians) - y_offset * :math.sin(radians))
       y_term = rotation_point.y + (x_offset * :math.sin(radians) + y_offset * :math.cos(radians))
-      %Vertex{x: x_term, y: y_term}
+      %Vertex{x: Float.round(x_term, 5), y: Float.round(y_term, 5)}
     end
   end
 
   defimpl String.Chars, for: Polygon do
-    @spec to_string(Polygon.t) :: String.t
     def to_string(%Polygon{} = p) do
       edges = Enum.map(p.edges, &String.Chars.to_string/1)
       "#{Enum.join(edges, ",")}"

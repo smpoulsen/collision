@@ -10,18 +10,17 @@ defprotocol Collidable do
 
   ## Examples
 
-    iex> Collidable.collision?(
-      ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-      ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2, midpoint: %{x: 4, y: 4}}
+      iex> Collidable.collision?(
+      ...>   Polygon.gen_regular_polygon(4, 2, 0, {0, 0}),
+      ...>   Polygon.gen_regular_polygon(4, 2, 0, {4, 4})
       ...> )
-    false
+      false
 
-    iex> Collidable.collision?(
-      ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-      ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 4,
-      ...>     midpoint: %{x: 4, y: 2}}
+      iex> Collidable.collision?(
+      ...>   Polygon.gen_regular_polygon(4, 2, 0, {0, 0}),
+      ...>   Polygon.gen_regular_polygon(4, 2, 0, {1, 1})
       ...> )
-    true
+      true
 
   """
   def collision?(any, any)
@@ -33,18 +32,17 @@ defprotocol Collidable do
 
   ## Examples
 
-    iex> Collidable.resolution(
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2, midpoint: %{x: 4, y: 4}}
-    ...> )
-    nil
+      iex> Collidable.resolution(
+      ...>   Polygon.gen_regular_polygon(4, 2, 0, {0, 0}),
+      ...>   Polygon.gen_regular_polygon(4, 2, 0, {4, 4})
+      ...> )
+      nil
 
-    iex> Collidable.resolution(
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 4,
-    ...>     midpoint: %{x: 4, y: 1}}
-    ...> )
-    {%Collision.Vector.Vector2{x: 0.7071067811865475, y: 0.7071067811865475}, 0.7071067811865475}
+      iex> Collidable.resolution(
+      ...>   Polygon.gen_regular_polygon(4, 2, 0, {0, 0}),
+      ...>   Polygon.gen_regular_polygon(4, 2, 0, {1, 1})
+      ...> )
+      {%Collision.Vector.Vector2{x: 0.7071067811865475, y: 0.7071067811865475}, 1.414213562373095}
 
   """
   def resolution(any, any)
@@ -58,19 +56,40 @@ defprotocol Collidable do
 
   ## Examples
 
-    iex> Collidable.resolve_collision(
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2, midpoint: %{x: 4, y: 4}}
-    ...> )
-    nil
+      iex> Collidable.resolve_collision(
+      ...>   Polygon.gen_regular_polygon(4, 2, 0, {0, 0}),
+      ...>   Polygon.gen_regular_polygon(4, 2, 0, {4, 4})
+      ...> )
+      nil
 
-    iex> Collidable.resolve_collision(
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 2},
-    ...>   %Collision.Polygon.RegularPolygon{n_sides: 4, radius: 4,
-    ...>     midpoint: %{x: 4, y: 1}}
-    ...> )
-    {%Collision.Vector.Vector2{x: 0.7071067811865475, y: 0.7071067811865475}, 0.7071067811865475}
-
+      iex> Collidable.resolve_collision(
+      ...>   Polygon.gen_regular_polygon(4, 2, 0, {0, 0}),
+      ...>   Polygon.gen_regular_polygon(4, 2, 0, {1, 1})
+      ...> )
+      {%Polygon{edges: [
+        %Edge{length: 2.8284271247461903, next: %Vertex{x: 0.0, y: 2.0},
+          point: %Vertex{x: 2.0, y: 0.0}},
+        %Edge{length: 2.8284271247461903, next: %Vertex{x: -2.0, y: 0.0},
+          point: %Vertex{x: 0.0, y: 2.0}},
+        %Edge{length: 2.8284271247461903, next: %Vertex{x: 0.0, y: -2.0},
+          point: %Vertex{x: -2.0, y: 0.0}},
+        %Edge{length: 2.8284271247461903, next: %Vertex{x: 2.0, y: 0.0},
+          point: %Vertex{x: 0.0, y: -2.0}}
+      ], vertices: [
+        %Vertex{x: 2.0, y: 0.0}, %Vertex{x: 0.0, y: 2.0},
+        %Vertex{x: -2.0, y: 0.0}, %Vertex{x: 0.0, y: -2.0}]
+      }, %Polygon{edges: [
+        %Edge{length: 2.8284271247461903, next: %Vertex{x: 2.0, y: 4.0},
+          point: %Vertex{x: 4.0, y: 2.0}},
+        %Edge{length: 2.8284271247461903, next: %Vertex{x: 0.0, y: 2.0},
+          point: %Vertex{x: 2.0, y: 4.0}},
+        %Edge{length: 2.8284271247461903, next: %Vertex{x: 2.0, y: 0.0},
+          point: %Vertex{x: 0.0, y: 2.0}},
+        %Edge{length: 2.8284271247461903, next: %Vertex{x: 4.0, y: 2.0},
+          point: %Vertex{x: 2.0, y: -0.0}}
+      ], vertices: [
+        %Vertex{x: 4.0, y: 2.0}, %Vertex{x: 2.0, y: 4.0},
+        %Vertex{x: 0.0, y: 2.0}, %Vertex{x: 2.0, y: 0.0}]}}
   """
   def resolve_collision(any, any)
 end
