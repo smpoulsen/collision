@@ -57,11 +57,22 @@ defmodule Collision.PolygonTest do
         {self, regular_polygon}
       end, fn
         (self, regular_polygon) ->
-          {self, regular_polygon}
-          vertices = for vertex <- regular_polygon.vertices do
-            %Vertex{x: max(vertex.x - 2, 0), y: max(vertex.y - 2, 0)}
-          end
-          regular_polygon = Polygon.from_vertices(vertices)
+          sides = length(regular_polygon.edges)
+          midpoint = Polygon.centroid(regular_polygon)
+          vertex_0 = Enum.at(regular_polygon.vertices, 0)
+          radius = Edge.calculate_length({midpoint, vertex_0})
+          origin = Vertex.from_tuple({0, 0})
+          angle = Edge.calculate_angle(
+            Edge.from_vertex_pair({vertex_0, origin}),
+            Edge.from_vertex_pair({origin, Enum.at(regular_polygon.vertices, 1)})
+          )
+
+          s = max(sides - 2, 3)
+          r = max(radius - 2, 1)
+          a = max(angle - 2, 0)
+          x = max(midpoint.x - 2, 0)
+          y = max(midpoint.y - 2, 0)
+          regular_polygon = Polygon.gen_regular_polygon(s, r, a, {x, y})
           {self, regular_polygon}
       end)
   end
@@ -148,4 +159,18 @@ defmodule Collision.PolygonTest do
     end
   end
 
+  property :sum_of_angles_is_n_sub_2_x_pi do
+    for_all p in polygon do
+      sum_of_angles = p.edges
+      |> Stream.cycle
+      |> Stream.chunk(2, 1)
+      |> Stream.take(length(p.edges))
+      |> Enum.map(&Edge.calculate_angle/1)
+      |> Enum.sum
+      |> Float.round(5)
+
+      n_sides = length(p.edges)
+      sum_of_angles == Float.round((n_sides - 2) * :math.pi, 5)
+    end
+  end
 end
