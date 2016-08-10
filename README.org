@@ -48,7 +48,7 @@ Add =collision= to your list of dependencies in =mix.exs=:
 
    #+BEGIN_SRC elixir
      def deps do
-       [{:collision, "~> 0.3.0"}]
+       [{:collision, "~> 0.3.1"}]
      end
    #+END_SRC
 
