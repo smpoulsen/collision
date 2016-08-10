@@ -155,7 +155,7 @@ defmodule Collision.Polygon do
   ## Example
 
       iex> p = Polygon.gen_regular_polygon(4, 4, 0, {0, 0})
-      iex> Polygon.translate_polygon(p, %{x: 2, y: 2})
+      iex> Polygon.translate(p, %{x: 2, y: 2})
       %Polygon{vertices: [
         %Vertex{x: 6.0, y: 2.0}, %Vertex{x: 2.0, y: 6.0},
         %Vertex{x: -2.0, y: 2.0}, %Vertex{x: 2.0, y: -2.0}
@@ -167,8 +167,8 @@ defmodule Collision.Polygon do
       ]}
 
   """
-  @spec translate_polygon(Polygon.t, %{x: number, y: number}) :: Polygon.t
-  def translate_polygon(polygon, %{x: _x, y: _y} = translation_vector) do
+  @spec translate(Polygon.t, %{x: number, y: number}) :: Polygon.t
+  def translate(polygon, %{x: _x, y: _y} = translation_vector) do
     polygon.vertices
     |> Enum.map(translate_vertex(translation_vector))
     |> Enum.map(&Vertex.round_vertex/1)
@@ -213,7 +213,7 @@ defmodule Collision.Polygon do
       ...>       %Vertex{x: 2, y: 2}, %Vertex{x: -2, y: 2},
       ...>       %Vertex{x: -2, y: -2}, %Vertex{x: 2, y: -2}
       ...>     ])
-      iex> Polygon.rotate_polygon_degrees(p, 90)
+      iex> Polygon.rotate_degrees(p, 90)
       %Polygon{edges: [
         %Edge{length: 4.0, next: %Vertex{x: -2.0, y: -2.0}, point: %Vertex{x: -2.0, y: 2.0}},
         %Edge{length: 4.0, next: %Vertex{x: 2.0, y: -2.0}, point: %Vertex{x: -2.0, y: -2.0}},
@@ -225,10 +225,10 @@ defmodule Collision.Polygon do
       ]}
 
   """
-  @spec rotate_polygon_degrees(Polygon.t, degrees, %{x: number, y: number}) :: Polygon.t
-  def rotate_polygon_degrees(polygon, degrees, point \\ %{x: 0, y: 0}) do
+  @spec rotate_degrees(Polygon.t, degrees, %{x: number, y: number}) :: Polygon.t
+  def rotate_degrees(polygon, degrees, point \\ %{x: 0, y: 0}) do
     angle_in_radians = Helper.degrees_to_radians(degrees)
-    rotate_polygon(polygon, angle_in_radians, point)
+    rotate(polygon, angle_in_radians, point)
   end
 
   @doc """
@@ -246,7 +246,7 @@ defmodule Collision.Polygon do
       ...>       %Vertex{x: 2, y: 2}, %Vertex{x: -2, y: 2},
       ...>       %Vertex{x: -2, y: -2}, %Vertex{x: 2, y: -2}
       ...>     ])
-      iex> Polygon.rotate_polygon(p, :math.pi)
+      iex> Polygon.rotate(p, :math.pi)
       %Polygon{edges: [
       %Edge{length: 4.0, next: %Vertex{x: 2.0, y: -2.0}, point: %Vertex{x: -2.0, y: -2.0}},
       %Edge{length: 4.0, next: %Vertex{x: 2.0, y: 2.0}, point: %Vertex{x: 2.0, y: -2.0}},
@@ -258,8 +258,8 @@ defmodule Collision.Polygon do
       ]}
 
   """
-  @spec rotate_polygon(Polygon.t, radians, %{x: number, y: number}) :: Polygon.t
-  def rotate_polygon(polygon, radians, rotation_point \\ %{x: 0, y: 0}) do
+  @spec rotate(Polygon.t, radians, %{x: number, y: number}) :: Polygon.t
+  def rotate(polygon, radians, rotation_point \\ %{x: 0, y: 0}) do
     rotate = rotate_vertex(radians, rotation_point)
     polygon.vertices
     |> Enum.map(fn vertex -> rotate.(vertex) end)
@@ -336,41 +336,41 @@ defmodule Collision.Polygon do
     def resolve_collision(%Polygon{convex: false} = p1, %Polygon{convex: true} = p2) do
       p1_convex_hull = Polygon.from_vertices(Vertex.graham_scan(p1.vertices))
       translation_vector = translation(p1_convex_hull, p2)
-      translated = Polygon.translate_polygon(p2, translation_vector)
+      translated = Polygon.translate(p2, translation_vector)
       opposite_vector = opposite_translation(translation_vector, p1_convex_hull, translated)
       case opposite_vector do
         x when x == translation_vector -> {p1, translated}
-        _ -> {p1, Polygon.translate_polygon(p2, opposite_vector)}
+        _ -> {p1, Polygon.translate(p2, opposite_vector)}
       end
     end
     def resolve_collision(%Polygon{convex: true} = p1, %Polygon{convex: false} = p2) do
       p2_convex_hull = Polygon.from_vertices(Vertex.graham_scan(p2.vertices))
       translation_vector = translation(p1, p2_convex_hull)
-      translated = Polygon.translate_polygon(p2_convex_hull, translation_vector)
+      translated = Polygon.translate(p2_convex_hull, translation_vector)
       opposite_vector = opposite_translation(translation_vector, p1, translated)
       case opposite_vector do
-        x when x == translation_vector -> {p1, Polygon.translate_polygon(p2, translation_vector)}
-        _ -> {p1, Polygon.translate_polygon(p2, opposite_vector)}
+        x when x == translation_vector -> {p1, Polygon.translate(p2, translation_vector)}
+        _ -> {p1, Polygon.translate(p2, opposite_vector)}
       end
     end
     def resolve_collision(%Polygon{convex: false} = p1, %Polygon{convex: false} = p2) do
       p1_convex_hull = Polygon.from_vertices(Vertex.graham_scan(p1.vertices))
       p2_convex_hull = Polygon.from_vertices(Vertex.graham_scan(p2.vertices))
       translation_vector = translation(p1_convex_hull, p2_convex_hull)
-      translated = Polygon.translate_polygon(p2_convex_hull, translation_vector)
+      translated = Polygon.translate(p2_convex_hull, translation_vector)
       opposite_vector = opposite_translation(translation_vector, p1_convex_hull, translated)
       case opposite_vector do
-        x when x == translation_vector -> {p1, Polygon.translate_polygon(p2, translation_vector)}
-        _ -> {p1, Polygon.translate_polygon(p2, opposite_vector)}
+        x when x == translation_vector -> {p1, Polygon.translate(p2, translation_vector)}
+        _ -> {p1, Polygon.translate(p2, opposite_vector)}
       end
     end
     def resolve_collision(%Polygon{} = p1, %Polygon{} = p2) do
       translation_vector = translation(p1, p2)
-      translated = Polygon.translate_polygon(p2, translation_vector)
+      translated = Polygon.translate(p2, translation_vector)
       opposite_vector = opposite_translation(translation_vector, p1, translated)
       case opposite_vector do
         x when x == translation_vector -> {p1, translated}
-        _ -> {p1, Polygon.translate_polygon(p2, opposite_vector)}
+        _ -> {p1, Polygon.translate(p2, opposite_vector)}
       end
     end
     defp translation(%Polygon{} = p1, %Polygon{} = p2) do

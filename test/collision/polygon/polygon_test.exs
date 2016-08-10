@@ -81,7 +81,7 @@ defmodule Collision.PolygonTest do
     for_all p in polygon do
       rotations = [-720, -360, 0, 360, 720]
       Enum.all?(rotations, fn r ->
-        rotated = Polygon.rotate_polygon_degrees(p, r)
+        rotated = Polygon.rotate_degrees(p, r)
         Vertex.round_vertices(p.vertices) == Vertex.round_vertices(rotated.vertices)
       end)
     end
@@ -110,7 +110,7 @@ defmodule Collision.PolygonTest do
   property :translation_moves_a_polygon do
     for_all {p, x, y} in {polygon, int, int} do
       polygon_translated = p
-      |> Polygon.translate_polygon(%{x: x, y: y})
+      |> Polygon.translate(%{x: x, y: y})
 
       zipped_vertices = Enum.zip(p.vertices, polygon_translated.vertices)
       Enum.all?(
@@ -126,7 +126,7 @@ defmodule Collision.PolygonTest do
     for_all p in regular_polygon do
       rotations = [-720, -360, 0, 360, 720]
       Enum.all?(rotations, fn r ->
-        rotated = Polygon.rotate_polygon_degrees(p, r)
+        rotated = Polygon.rotate_degrees(p, r)
         Vertex.round_vertices(p.vertices) ==
           Vertex.round_vertices(rotated.vertices)
       end)
@@ -149,7 +149,7 @@ defmodule Collision.PolygonTest do
   property :translation_moves_a_regular_polygon do
     for_all {p, x, y} in {regular_polygon, int, int} do
       polygon_translated = p
-      |> Polygon.translate_polygon(%{x: x, y: y})
+      |> Polygon.translate(%{x: x, y: y})
 
       zipped_vertices = Enum.zip(p.vertices, polygon_translated.vertices)
       Enum.all?(
