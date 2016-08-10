@@ -1,10 +1,9 @@
-defmodule Collision.SeparatingAxis do
+defmodule Collision.Detection.SeparatingAxis do
   @moduledoc """
   Implements the separating axis theorem for collision detection.
 
-  Checks for collision by projecting all of the edges of a polygon
-  against test axes, which are the normals of all the edges of
-  both polygons that are being tested.
+  Checks for collision by projecting all of the edges of a pair of polygons
+  against test axes that are the normals of their edges.
 
   If there is any axis for which the projections aren't overlapping,
   then the polygons are not colliding with one another. If all of
@@ -12,19 +11,31 @@ defmodule Collision.SeparatingAxis do
   """
 
   alias Collision.Polygon.Vertex
-  alias Collision.Polygon.RegularPolygon
+  alias Collision.Polygon.Polygon
   alias Collision.Vector.Vector2
 
   @type axis :: {Vertex.t, Vertex.t}
-  @type polygon :: RegularPolygon.t
+  @type polygon :: Polygon.t
 
   @doc """
   Check for collision between two polygons.
 
   Returns: `true` | `false`
 
+  ## Examples
+
+      iex> p1 = Polygon.gen_regular_polygon(4, 4, 0, {0, 0})
+      iex> p2 = Polygon.gen_regular_polygon(4, 6, 0, {2, 2})
+      iex> SeparatingAxis.collision?(p1, p2)
+      true
+
+      iex> p1 = Polygon.gen_regular_polygon(3, 1, 0, {-5, 8})
+      iex> p2 = Polygon.gen_regular_polygon(4, 6, 0, {2, 2})
+      iex> SeparatingAxis.collision?(p1, p2)
+      false
+
   """
-  @spec collision?([axis], [axis]) :: boolean
+  @spec collision?(polygon, polygon) :: boolean
   def collision?(polygon_1, polygon_2) do
     projections = collision_projections(polygon_1, polygon_2)
     Enum.all?(projections, fn zipped_projection ->
@@ -39,19 +50,31 @@ defmodule Collision.SeparatingAxis do
 
   Returns: nil | {Vector2.t, float}
 
+  ## Examples
+
+      iex> p1 = Polygon.gen_regular_polygon(4, 4, 45, {0, 0})
+      iex> p2 = Polygon.gen_regular_polygon(4, 4, 45, {4, 0})
+      iex> {mtv, magnitude} = SeparatingAxis.collision_mtv(p1, p2)
+      iex> Vector.round_components(mtv, 2)
+      %Collision.Vector.Vector2{x: -1.0, y: 0.0}
+      iex> Float.round(magnitude, 2)
+      1.66
+
+      iex> p1 = Polygon.gen_regular_polygon(3, 1, 0, {-5, 8})
+      iex> p2 = Polygon.gen_regular_polygon(4, 6, 0, {2, 2})
+      iex> SeparatingAxis.collision_mtv(p1, p2)
+      nil
+
   """
   # TODO There is repetition between this and collision?, but it
   # runs faster this way. Refactoring opportunity in the future.
-  @spec collision_mtv([axis], [axis]) :: {Vector2.t, number}
+  @spec collision_mtv(polygon, polygon) :: {Vector2.t, number}
   def collision_mtv(polygon_1, polygon_2) do
-    axes_to_test = test_axes(polygon_1) ++ test_axes(polygon_2)
-    zipped_projections = collision_projections(polygon_1, polygon_2)
-    axes_and_projections = Enum.zip(axes_to_test, zipped_projections)
-    in_collision = axes_and_projections
-    |> Enum.all?(fn {_axis, zipped_projection} ->
-      overlap?(zipped_projection) || containment?(zipped_projection)
-    end)
+    in_collision = collision?(polygon_1, polygon_2)
     if in_collision do
+      axes_to_test = test_axes(polygon_1.vertices) ++ test_axes(polygon_2.vertices)
+      zipped_projections = collision_projections(polygon_1, polygon_2)
+      axes_and_projections = Enum.zip(axes_to_test, zipped_projections)
       axes_and_projections
       |> minimum_overlap
     end
@@ -61,6 +84,7 @@ defmodule Collision.SeparatingAxis do
   # The list of vertices is expected to be ordered counter-clockwise,
   # so we're using the left normal to generate test axes.
   @spec test_axes([Vertex.t] | polygon) :: [axis]
+  defp test_axes(%{vertices: vertices}), do: test_axes(vertices)
   defp test_axes(vertices) do
     vertices
     |> Stream.chunk(2, 1, [Enum.at(vertices, 0)])
@@ -76,6 +100,7 @@ defmodule Collision.SeparatingAxis do
     dot_products = vertices
     |> Enum.map(fn vertex ->
       vertex
+      |> Vertex.to_tuple
       |> Collision.Vector.from_tuple
       |> Vector.dot_product(axis)
     end)
@@ -83,10 +108,10 @@ defmodule Collision.SeparatingAxis do
   end
 
   # Given a polygon, project all of its edges onto an axis.
-  @spec project_onto_axes(polygon, [Vector2.t]) :: [Vector2.t]
-  defp project_onto_axes(polygon, axes) do
+  @spec project_onto_axes([Vertex.t], [Vector2.t]) :: [Vector2.t]
+  defp project_onto_axes(vertices, axes) do
     Enum.map(axes, fn axis ->
-      project_onto_axis(polygon, axis)
+      project_onto_axis(vertices, axis)
     end)
   end
 
@@ -141,6 +166,9 @@ defmodule Collision.SeparatingAxis do
 
   # Generate a zipped list of projections for both polygons.
   @spec collision_projections(polygon, polygon) :: [{Vector2.t, Vector2.t}]
+  defp collision_projections(%{vertices: v1}, %{vertices: v2}) do
+    collision_projections(v1, v2)
+  end
   defp collision_projections(p1, p2) do
     axes_to_test = test_axes(p1) ++ test_axes(p2)
     p1_projection = project_onto_axes(p1, axes_to_test)
