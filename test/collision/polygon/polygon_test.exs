@@ -38,7 +38,7 @@ defmodule Collision.PolygonTest do
         (self, polygon) ->
           {self, polygon}
           vertices = for vertex <- polygon.vertices do
-            %Vertex{x: max(vertex.x - 2, 0), y: max(vertex.y - 2, 0)}
+            %Vertex{x: max(vertex.x / 2, 0), y: max(vertex.y / 2, 0)}
           end
           polygon = Polygon.from_vertices(vertices)
           {self, polygon}
@@ -93,6 +93,7 @@ defmodule Collision.PolygonTest do
     end
   end
 
+  @tag iterations: 1_000
   property :translating_by_mtv_resolves_collision do
     for_all {p1, p2} in such_that({pp1, pp2} in {polygon, polygon}
       when Collidable.collision?(pp1, pp2)) do

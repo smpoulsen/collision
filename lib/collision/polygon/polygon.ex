@@ -4,14 +4,14 @@ defmodule Collision.Polygon do
   the edges, centroid, rotation angles, and whether the polygon is concave
   or convex.
   """
-  defstruct edges: [], vertices: []
+  defstruct edges: [], vertices: [], convex: true
 
+  alias Collision.Detection.SeparatingAxis
   alias Collision.Polygon
   alias Collision.Polygon.Edge
-  alias Collision.Polygon.Vertex
   alias Collision.Polygon.Helper
+  alias Collision.Polygon.Vertex
   alias Collision.Vector.Vector2
-  alias Collision.Detection.SeparatingAxis
 
   @type t :: %Polygon{edges: [Edge.t]}
   @type axis :: {Vertex.t, Vertex.t}
@@ -46,7 +46,8 @@ defmodule Collision.Polygon do
     |> Enum.map(fn [point1, point2] ->
       Edge.from_vertex_pair({point1, point2})
     end)
-    %Polygon{edges: edges, vertices: vertices}
+    convex = convex?(edges)
+    %Polygon{edges: edges, vertices: vertices, convex: convex}
   end
 
   @doc """
@@ -133,17 +134,17 @@ defmodule Collision.Polygon do
     ...>     %Vertex{x: -2, y: 2}, %Vertex{x: -2, y: -2}, %Vertex{x: 2, y: -2}])
     iex> Polygon.convex?(p)
     false
+
   """
   @spec convex?(Polygon.t | [Edge.t]) :: boolean
   def convex?(%Polygon{edges: edges}), do: convex?(edges)
   def convex?(edges) do
-    require IEx; IEx.pry
     edges
     |> Stream.cycle
     |> Stream.chunk(2, 1)
     |> Stream.take(length(edges))
     |> Stream.map(&Edge.calculate_angle/1)
-    |> Enum.all?(&(&1 < :math.pi))
+    |> Enum.all?(&(&1 <= :math.pi))
   end
 
   @doc """
@@ -167,9 +168,9 @@ defmodule Collision.Polygon do
 
   """
   @spec translate_polygon(Polygon.t, %{x: number, y: number}) :: Polygon.t
-  def translate_polygon(polygon, %{x: _x, y: _y} = translation) do
+  def translate_polygon(polygon, %{x: _x, y: _y} = translation_vector) do
     polygon.vertices
-    |> Enum.map(translate_vertex(translation))
+    |> Enum.map(translate_vertex(translation_vector))
     |> Enum.map(&Vertex.round_vertex/1)
     |> from_vertices
   end
@@ -297,44 +298,111 @@ defmodule Collision.Polygon do
   end
 
   defimpl Collidable, for: Polygon do
-    @spec collision?(Polygon.t, Polygon.t) :: boolean
+    def collision?(%Polygon{convex: false} = p1, %Polygon{convex: true} = p2) do
+      p1_convex_hull = Polygon.from_vertices(Vertex.graham_scan(p1.vertices))
+      collision?(p1_convex_hull, p2)
+    end
+    def collision?(%Polygon{convex: true} = p1, %Polygon{convex: false} = p2) do
+      p2_convex_hull = Polygon.from_vertices(Vertex.graham_scan(p2.vertices))
+      collision?(p1, p2_convex_hull)
+    end
+    def collision?(%Polygon{convex: false} = p1, %Polygon{convex: false} = p2) do
+      p1_convex_hull = Polygon.from_vertices(Vertex.graham_scan(p1.vertices))
+      p2_convex_hull = Polygon.from_vertices(Vertex.graham_scan(p2.vertices))
+      collision?(p1_convex_hull, p2_convex_hull)
+    end
     def collision?(%Polygon{} = p1, %Polygon{} = p2) do
       SeparatingAxis.collision?(p1, p2)
     end
 
-    @spec resolution(Polygon.t, Polygon.t) :: {Vector2.t, number}
+    def resolution(%Polygon{convex: false} = p1, %Polygon{convex: true} = p2) do
+      p1_convex_hull = Polygon.from_vertices(Vertex.graham_scan(p1.vertices))
+      resolution(p1_convex_hull, p2)
+    end
+    def resolution(%Polygon{convex: true} = p1, %Polygon{convex: false} = p2) do
+      p2_convex_hull = Polygon.from_vertices(Vertex.graham_scan(p2.vertices))
+      resolution(p1, p2_convex_hull)
+    end
+    def resolution(%Polygon{convex: false} = p1, %Polygon{convex: false} = p2) do
+      p1_convex_hull = Polygon.from_vertices(Vertex.graham_scan(p1.vertices))
+      p2_convex_hull = Polygon.from_vertices(Vertex.graham_scan(p2.vertices))
+      resolution(p1_convex_hull, p2_convex_hull)
+    end
     def resolution(%Polygon{} = p1, %Polygon{} = p2) do
       SeparatingAxis.collision_mtv(p1, p2)
     end
 
-    @spec resolve_collision(Polygon.t, Polygon.t) :: {Polygon.t, Polygon.t}
-    def resolve_collision(%Polygon{} = p1, %Polygon{} = p2) do
-      {mtv, magnitude} = resolution(p1, p2)
-      p1_midpoint = Polygon.centroid(p1)
-      p2_midpoint = Polygon.centroid(p2)
-      vector_from_p1_to_p2 = %Vector2{
-        x: p2_midpoint.x - p1_midpoint.x,
-        y: p2_midpoint.y - p1_midpoint.y}
-      translation_vector =
-        case Vector.dot_product(mtv, vector_from_p1_to_p2) do
-          x when x < 0 ->
-            Vector.scalar_mult(mtv, -1 * magnitude)
-          _ ->
-            Vector.scalar_mult(mtv, magnitude)
-        end
+    # TODO Dry this up
+    def resolve_collision(%Polygon{convex: false} = p1, %Polygon{convex: true} = p2) do
+      p1_convex_hull = Polygon.from_vertices(Vertex.graham_scan(p1.vertices))
+      translation_vector = translation(p1_convex_hull, p2)
       translated = Polygon.translate_polygon(p2, translation_vector)
+      opposite_vector = opposite_translation(translation_vector, p1_convex_hull, translated)
+      case opposite_vector do
+        x when x == translation_vector -> {p1, translated}
+        _ -> {p1, Polygon.translate_polygon(p2, opposite_vector)}
+      end
+    end
+    def resolve_collision(%Polygon{convex: true} = p1, %Polygon{convex: false} = p2) do
+      p2_convex_hull = Polygon.from_vertices(Vertex.graham_scan(p2.vertices))
+      translation_vector = translation(p1, p2_convex_hull)
+      translated = Polygon.translate_polygon(p2_convex_hull, translation_vector)
+      opposite_vector = opposite_translation(translation_vector, p1, translated)
+      case opposite_vector do
+        x when x == translation_vector -> {p1, Polygon.translate_polygon(p2, translation_vector)}
+        _ -> {p1, Polygon.translate_polygon(p2, opposite_vector)}
+      end
+    end
+    def resolve_collision(%Polygon{convex: false} = p1, %Polygon{convex: false} = p2) do
+      p1_convex_hull = Polygon.from_vertices(Vertex.graham_scan(p1.vertices))
+      p2_convex_hull = Polygon.from_vertices(Vertex.graham_scan(p2.vertices))
+      translation_vector = translation(p1_convex_hull, p2_convex_hull)
+      translated = Polygon.translate_polygon(p2_convex_hull, translation_vector)
+      opposite_vector = opposite_translation(translation_vector, p1_convex_hull, translated)
+      case opposite_vector do
+        x when x == translation_vector -> {p1, Polygon.translate_polygon(p2, translation_vector)}
+        _ -> {p1, Polygon.translate_polygon(p2, opposite_vector)}
+      end
+    end
+    def resolve_collision(%Polygon{} = p1, %Polygon{} = p2) do
+      translation_vector = translation(p1, p2)
+      translated = Polygon.translate_polygon(p2, translation_vector)
+      opposite_vector = opposite_translation(translation_vector, p1, translated)
+      case opposite_vector do
+        x when x == translation_vector -> {p1, translated}
+        _ -> {p1, Polygon.translate_polygon(p2, opposite_vector)}
+      end
+    end
+    defp translation(%Polygon{} = p1, %Polygon{} = p2) do
+      case resolution(p1, p2) do
+        nil -> %Vector2{x: 0, y: 0}
+        {mtv, magnitude} ->
+          p1_midpoint = Polygon.centroid(p1)
+          p2_midpoint = Polygon.centroid(p2)
+          vector_from_p1_to_p2 = %Vector2{
+            x: p2_midpoint.x - p1_midpoint.x,
+            y: p2_midpoint.y - p1_midpoint.y}
+          case Vector.dot_product(mtv, vector_from_p1_to_p2) do
+            x when x < 0 ->
+              Vector.scalar_mult(mtv, magnitude)
+            _ ->
+              Vector.scalar_mult(mtv, -1 * magnitude)
+          end
+      end
+    end
+    defp opposite_translation(translation_vector,
+          %Polygon{} = p1, %Polygon{} = translated) do
       translated_mtv = Collidable.resolution(p1, translated)
       # TODO This is a workaround. There's something wrong with the calculation
       # for vector_from_p1_to_p2 that's causing the translation vector to be
       # flipped in cases of (near total) containment.
       case translated_mtv do
-        nil -> {p1, Polygon.translate_polygon(p2, translation_vector)}
+        nil -> translation_vector
         {_mtv, magnitude} ->
           if round(magnitude) == 0 do
-            {p1, Polygon.translate_polygon(p2, translation_vector)}
+            translation_vector
           else
-            opposite_translation = Vector.scalar_mult(translation_vector, -1)
-            {p1, Polygon.translate_polygon(p2, opposite_translation)}
+            Vector.scalar_mult(translation_vector, -1)
           end
       end
     end

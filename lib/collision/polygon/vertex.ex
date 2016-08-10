@@ -53,7 +53,7 @@ defmodule Collision.Polygon.Vertex do
   """
   @spec determinant(Vertex.t, Vertex.t, Vertex.t) :: number
   defp determinant(%Vertex{} = v1, %Vertex{} = v2, %Vertex{} = v3) do
-    (v2.x - v1.x)*(v3.y - v1.y) - (v2.y - v1.y)*(v3.x - v1.x)
+    (v2.x - v1.x) * (v3.y - v1.y) - (v2.y - v1.y) * (v3.x - v1.x)
   end
   defp counter_clockwise(v1, v2, v3) do
     determinant(v1, v2, v3) > 0
