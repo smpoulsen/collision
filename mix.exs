@@ -3,7 +3,7 @@ defmodule Collision.Mixfile do
 
   def project do
     [app: :collision,
-     version: "0.2.0",
+     version: "0.3.0",
      elixir: "~> 1.3",
      description: description(),
      package: package(),
@@ -31,7 +31,7 @@ defmodule Collision.Mixfile do
 
   defp description do
     """
-    Polygon collision detection and vector operations.
+    A library for creating, manipulating, and detecting and resolving collisions between polygons.
     """
   end
 

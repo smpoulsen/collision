@@ -1,0 +1,57 @@
+* Collision
+[[https://travis-ci.org/tpoulsen/collision][https://travis-ci.org/tpoulsen/collision.svg?branch=master]]
+
+A library for generating and working with polygons, particularly for detecting and resolving collisions between them.
+
+** Implements the [[https://en.wikipedia.org/wiki/Hyperplane_separation_theorem][separating axis theorem]] for polygon collision detection in 2D space.
+Using regular polygons with an arbitrary number of sides and of an artbitrary size, can detect collisions and calculate the minimum translation vector to resolve collision.
+
+* Current functionality:
+** Detailed documentation available at [[https://hexdocs.pm/collision/][hexdocs]] 
+** Functions
+- Generate polygons
+  - =Polygon.from_vertices/1= - Create a polygon from a list of vertices, expected to be in counter-clockwise order. Polygons can be convex or concave. Currently, if a polygon is concave then a convex hull is used in collision checks.
+  - =Polygon.gen_regular_polygon/4= - Create a regular[fn:1] polygon from a number of sides, radius, rotation angle, and midpoint.
+- Find out information about the polygon
+  - =Polygon.convex?/1= - Determine whether a polygon is [[https://en.wikipedia.org/wiki/Convex_polygon][convex]] 
+  - =Polygon.centroid/1= - Find a polygon's midpoint
+- Manipulate a polygon
+  - =Polygon.translate/2= - Translate a polygon in Cartesian space
+  - =Polygon.rotate/3= - Rotate a polygon by a measure in radians around a point.
+  - =Polygon.rotate_degrees/3= - As above but with degrees.
+- Determine and handle collisions 
+  - =Collidable.collision?/2= - Check for collision between two polygons
+  - =Collidable.resolution/2= - Get the minimum translation vector and magnitude to move two polygons out of collision.
+  - =Collidable.resolve_collision/2= - Given two polygons, move them out of collision and returns the translated polygons.
+- Work with polygon edges
+  - =Edge.from_vertex_pair/1= - Construct an edge from a pair of vertices
+  - =Edge.calculate_length/1= - Find the length of an edge
+  - =Edge.calculate_angle/2= - Calculate the angle made by two edges meeting at a vertex.
+- Work with vertices
+  - =Vertex.from_tuple/1= - Construct a vertex from a tuple of numbers
+  - =Vertex.to_tuple/1= - Revert a vertex to a tuple
+  - =Vertex.graham_scan/1= - Construct a convex hull that bounds a list of vertices describing a polygon
+  - =Vertex.round_vertices/1= - Round the components of a vertex
+
+* Roadmap
+- [ ] Additional means of collision detection
+  - [ ] Detect impending collisions
+- [ ] More accurately detect collisions when polygons are concave (via triangulation)
+- [ ] 3D collision detection
+  - [ ] 3D objects via polygon meshes
+- [ ] Optimization 
+
+
+* Installation
+
+Add =collision= to your list of dependencies in =mix.exs=:
+
+   #+BEGIN_SRC elixir
+     def deps do
+       [{:collision, "~> 0.3.0"}]
+     end
+   #+END_SRC
+
+* Footnotes
+
+[fn:1] A polygon with n equal sides and n equal angles.
