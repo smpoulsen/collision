@@ -1,4 +1,4 @@
-Copyright (c) 2016, Travis Poulsen
+Copyright (c) 2016, Sylvie Poulsen
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
