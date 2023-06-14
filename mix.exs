@@ -38,9 +38,9 @@ defmodule Collision.Mixfile do
   defp package do
     [
       licenses: ["BSD2"],
-      maintainers: ["Travis Poulsen"],
+      maintainers: ["Sylvie Poulsen"],
       links: %{
-        "Github" => "https://github.com/tpoulsen/collision",
+        "Github" => "https://github.com/smpoulsen/collision",
         "Docs" => "https://hexdocs.pm/collision/"
       }
     ]
